@@ -1,7 +1,7 @@
 /*!
- * luci-theme-FluentDesign v2 — dark shell, vendored from luci-theme-footstrap
+ * luci-theme-Basalt v2 — dark shell, vendored from luci-theme-footstrap
  * Copyright 2026 footstrap contributors
- * Copyright 2026 FluentDesign Theme Contributors
+ * Copyright 2026 Basalt Theme Contributors
  * Licensed under the Apache License v2.0
  * http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -247,7 +247,7 @@
 
 	/* no component bridge (--*-hsl, --*-rgb): docs/conventions.md "Writing CSS" ("No colour
 	 * literals"). The one surviving --*-rgb is luci-mod-network's own (base/95-luci.css), not ours. */
-	/* FluentDesign v2: single dark palette, vendored from footstrap's dark
+	/* Basalt v2: single dark palette, vendored from footstrap's dark
 	 * "footstrap/GitHub Primer dimmed" colourway. Light mode, the alternate
 	 * palettes and every appearance axis were intentionally removed — the
 	 * chrome hardcodes <html data-darkmode="true">. */
@@ -2496,7 +2496,7 @@ body[theme="dark"] #app .module-settings__item {
 	 * appearance:none and never see it. */
 	::selection { background: var(--fs-accent); color: var(--fs-on-accent); }
 	:root { caret-color: var(--fs-accent); accent-color: var(--fs-accent); }
-	/* FluentDesign v2: a BUILT-IN, always-on body texture — an original
+	/* Basalt v2: a BUILT-IN, always-on body texture — an original
 	 * geometric motif (rounded tiles, rings and a tiny network graph). The
 	 * SVG is masked with the theme ink so only its alpha silhouette is
 	 * painted; source: pattern/texture.svg.
@@ -2507,7 +2507,7 @@ body[theme="dark"] #app .module-settings__item {
 	 * body/.fs-main/footer stay transparent; the attribute-qualified
 	 * selectors outrank the plain body/.fs-main/footer rules in 20-shell.css. */
 	:root {
-		--fs-pattern-url: url("/luci-static/fluentdesign/pattern/texture.svg");
+		--fs-pattern-url: url("/luci-static/basalt/pattern/texture.svg");
 		--fs-pattern-size: 260px;
 		--fs-pattern-strength: .22;
 	}
@@ -3645,7 +3645,7 @@ body[theme="dark"] #app .module-settings__item {
 		outline: 2px solid var(--fs-accent);
 		outline-offset: 2px;
 	}
-	/* FluentDesign v2: page cards are translucent so the built-in body
+	/* Basalt v2: page cards are translucent so the built-in body
 	 * texture reads through them. Only the big content surfaces are
 	 * affected — nav dropdowns, modal dialogs, the tab strip, alerts,
 	 * inputs and DATA TABLES keep their opaque surface for legibility.
@@ -4112,7 +4112,7 @@ body[theme="dark"] #app .module-settings__item {
 
 	/* .fs-ind-compact/.fs-bar-actrow live with the bar in 20-shell.css too — only the top delta lives here */
 
-	/* FluentDesign v2: footstrap sets .fs-bar-stack from JS fit measurements
+	/* Basalt v2: footstrap sets .fs-bar-stack from JS fit measurements
 	 * (fs-chrome.js). This theme ships no fit engine, so a media query plays
 	 * the same role below 860px: brand/right-cluster on row one, the menu
 	 * becomes a horizontally scrollable pill strip on row two. */

@@ -1,5 +1,5 @@
 {#
-	luci-theme-FluentDesign v2
+	luci-theme-Basalt v2
 
 	Dark top-bar shell, vendored visually from luci-theme-footstrap
 	(Apache-2.0). Structure contract: every container opened here is
@@ -42,7 +42,7 @@
 </head>
 
 <!-- theme="dark": iStoreOS apps (quickstart, VUM, iStore) read this Argon-established
-     contract to switch their bundled palettes; FluentDesign is always dark -->
+     contract to switch their bundled palettes; Basalt is always dark -->
 <body class="lang_{{ dispatcher.lang }}{% if (ctx.authsession): %} logged-in{% endif %}" theme="dark" data-page="{{ fs_page }}">
 
 	<div class="fs-pattern" data-fs-chrome aria-hidden="true"></div>

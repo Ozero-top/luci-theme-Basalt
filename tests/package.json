@@ -1,7 +1,7 @@
 {
-  "name": "fluentdesign-theme-tests",
+  "name": "basalt-theme-tests",
   "private": true,
-  "description": "Browser compatibility harness for luci-theme-FluentDesign",
+  "description": "Browser compatibility harness for luci-theme-Basalt",
   "type": "module",
   "scripts": {
     "test": "node run-browser-tests.mjs"

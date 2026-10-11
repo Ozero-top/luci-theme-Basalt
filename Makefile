@@ -1,12 +1,12 @@
 #
-# Copyright (C) 2026 FluentDesign Theme Contributors
+# Copyright (C) 2026 Basalt Theme Contributors
 #
 # This is free software, licensed under the Apache License, Version 2.0 .
 #
 
 include $(TOPDIR)/rules.mk
 
-LUCI_TITLE:=FluentDesign Theme - dark top navigation theme for LuCI
+LUCI_TITLE:=Basalt Theme - dark top navigation theme for LuCI
 LUCI_DEPENDS:=+luci-base
 PKG_VERSION:=2.0.4
 PKG_RELEASE:=1

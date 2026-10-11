@@ -1,5 +1,5 @@
 {#
-	luci-theme-FluentDesign v2
+	luci-theme-Basalt v2
 
 	Closes every container opened in header.ut, in reverse order:
 	  .fs-content -> <footer> -> .fs-main -> .fs-shell
@@ -36,7 +36,7 @@
 		L.require('ui').then(function () {
 			var saved = L.env.resource_version;
 			L.env.resource_version = (saved ? saved + '-' : '') + 'fd2';
-			L.require('menu-fluentdesign');
+			L.require('menu-basalt');
 			L.env.resource_version = saved;
 		});
 	</script>

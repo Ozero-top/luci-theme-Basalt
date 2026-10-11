@@ -69,7 +69,7 @@
 
 	/* .fs-ind-compact/.fs-bar-actrow live with the bar in 20-shell.css too — only the top delta lives here */
 
-	/* FluentDesign v2: footstrap sets .fs-bar-stack from JS fit measurements
+	/* Basalt v2: footstrap sets .fs-bar-stack from JS fit measurements
 	 * (fs-chrome.js). This theme ships no fit engine, so a media query plays
 	 * the same role below 860px: brand/right-cluster on row one, the menu
 	 * becomes a horizontally scrollable pill strip on row two. */

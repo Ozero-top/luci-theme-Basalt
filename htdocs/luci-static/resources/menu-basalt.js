@@ -3,7 +3,7 @@
 'require ui';
 
 /*
- * luci-theme-FluentDesign v2 — top-bar menu renderer.
+ * luci-theme-Basalt v2 — top-bar menu renderer.
  *
  * Self-contained port of luci-theme-footstrap's chrome menu (Apache-2.0),
  * minus the SPA router, fit engine, rail and preferences: the layout is

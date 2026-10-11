@@ -77,7 +77,7 @@ jobs:
           set -euo pipefail
           # LUCI_NAME derives from the directory name (luci.mk), so the
           # capitalization must match the Package/ define in the Makefile.
-          pkg="sdk/package/luci-theme-FluentDesign"
+          pkg="sdk/package/luci-theme-Basalt"
           mkdir -p "$pkg"
           cp -a Makefile ucode htdocs root "$pkg"/
 
@@ -101,9 +101,9 @@ jobs:
           grep -q 'CONFIG_PACKAGE_liblucihttp-lua' .config \
             || echo '# CONFIG_PACKAGE_liblucihttp-lua is not set' >> .config
           echo 'CONFIG_PACKAGE_liblucihttp-ucode=y' >> .config
-          echo 'CONFIG_PACKAGE_luci-theme-FluentDesign=y' >> .config
+          echo 'CONFIG_PACKAGE_luci-theme-Basalt=y' >> .config
           make defconfig
-          if ! make package/luci-theme-FluentDesign/compile -j1 V=s; then
+          if ! make package/luci-theme-Basalt/compile -j1 V=s; then
             echo '--- download dir ---'
             ls -la dl/ 2>/dev/null || true
             echo '--- per-package logs ---'
@@ -122,8 +122,8 @@ jobs:
           # locally built apk drops the arch tail ("<name>-<version>-rN.apk").
           # The name case is preserved in a local build, so match -i.
           case '${{ matrix.ext }}' in
-            ipk) pat='luci-theme-FluentDesign_[0-9][^/]*_all\.ipk$' ;;
-            apk) pat='luci-theme-fluentdesign-[0-9][^/]*\.apk$' ;;
+            ipk) pat='luci-theme-Basalt_[0-9][^/]*_all\.ipk$' ;;
+            apk) pat='luci-theme-basalt-[0-9][^/]*\.apk$' ;;
           esac
           art="$(find bin/packages -type f -name '*.${{ matrix.ext }}' \
             | grep -Ei "$pat" || true)"
@@ -134,16 +134,16 @@ jobs:
           # The staged install tree (ipkg-all/... for opkg, .pkgdir for apk)
           # must carry every file class the package is supposed to ship.
           for f in \
-            usr/share/ucode/luci/template/themes/fluentdesign/header.ut \
-            usr/share/ucode/luci/template/themes/fluentdesign/footer.ut \
-            usr/share/ucode/luci/template/themes/fluentdesign/sysauth.ut \
-            usr/share/ucode/luci/template/themes/fluentdesign/head_meta.ut \
-            www/luci-static/fluentdesign/css/cascade.css \
-            www/luci-static/fluentdesign/pattern/texture.svg \
-            www/luci-static/fluentdesign/logo.svg \
-            www/luci-static/fluentdesign/manifest.json \
-            www/luci-static/resources/menu-fluentdesign.js \
-            etc/uci-defaults/30_luci-theme-FluentDesign
+            usr/share/ucode/luci/template/themes/basalt/header.ut \
+            usr/share/ucode/luci/template/themes/basalt/footer.ut \
+            usr/share/ucode/luci/template/themes/basalt/sysauth.ut \
+            usr/share/ucode/luci/template/themes/basalt/head_meta.ut \
+            www/luci-static/basalt/css/cascade.css \
+            www/luci-static/basalt/pattern/texture.svg \
+            www/luci-static/basalt/logo.svg \
+            www/luci-static/basalt/manifest.json \
+            www/luci-static/resources/menu-basalt.js \
+            etc/uci-defaults/30_luci-theme-Basalt
           do
             if ! find build_dir -type f -path "*/$f" | grep -q .; then
               echo "missing from staging: $f" >&2
@@ -154,14 +154,14 @@ jobs:
           # v2 removed the settings page, UCI conffile and login templates:
           # none of them may sneak back into the assembled package.
           for f in \
-            usr/share/ucode/luci/template/themes/fluentdesign/header_login.ut \
-            usr/share/ucode/luci/template/themes/fluentdesign/footer_login.ut \
-            usr/share/ucode/luci/template/themes/fluentdesign/out_header_login.ut \
-            www/luci-static/fluentdesign/css/dark.css \
-            www/luci-static/resources/view/system/fluentdesign.js \
-            etc/config/fluentdesign \
-            usr/share/luci/menu.d/luci-theme-fluentdesign.json \
-            usr/share/rpcd/acl.d/luci-theme-fluentdesign.json
+            usr/share/ucode/luci/template/themes/basalt/header_login.ut \
+            usr/share/ucode/luci/template/themes/basalt/footer_login.ut \
+            usr/share/ucode/luci/template/themes/basalt/out_header_login.ut \
+            www/luci-static/basalt/css/dark.css \
+            www/luci-static/resources/view/system/basalt.js \
+            etc/config/basalt \
+            usr/share/luci/menu.d/luci-theme-basalt.json \
+            usr/share/rpcd/acl.d/luci-theme-basalt.json
           do
             if find build_dir -type f -path "*/$f" | grep -q .; then
               echo "removed file still staged: $f" >&2
@@ -173,10 +173,10 @@ jobs:
       - name: Upload package artifact
         uses: actions/upload-artifact@v4
         with:
-          name: luci-theme-FluentDesign-${{ matrix.version }}
+          name: luci-theme-Basalt-${{ matrix.version }}
           if-no-files-found: error
           # Only the theme package itself, not the dependency packages
           # (lucihttp/rpcd/...) that the SDK built alongside it.
           path: |
-            sdk/bin/packages/**/luci-theme-FluentDesign_*_all.ipk
-            sdk/bin/packages/**/luci-theme-FluentDesign-*.apk
+            sdk/bin/packages/**/luci-theme-Basalt_*_all.ipk
+            sdk/bin/packages/**/luci-theme-Basalt-*.apk

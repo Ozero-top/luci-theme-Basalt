@@ -1,15 +1,15 @@
 #!/bin/sh
 #
-# Register luci-theme-FluentDesign with LuCI and activate it on fresh install.
+# Register luci-theme-Basalt with LuCI and activate it on fresh install.
 # resourcebase (/luci-static/resources) is intentionally left untouched so that
 # cbi.js / luci.js and all shared LuCI resources keep resolving correctly.
 #
 
 if [ "$PKG_UPGRADE" != 1 ]; then
-	uci get luci.themes.FluentDesign >/dev/null 2>&1 || \
+	uci get luci.themes.Basalt >/dev/null 2>&1 || \
 	uci batch <<-EOF
-		set luci.themes.FluentDesign=/luci-static/fluentdesign
-		set luci.main.mediaurlbase=/luci-static/fluentdesign
+		set luci.themes.Basalt=/luci-static/basalt
+		set luci.main.mediaurlbase=/luci-static/basalt
 		commit luci
 	EOF
 fi

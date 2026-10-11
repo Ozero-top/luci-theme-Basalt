@@ -13,7 +13,7 @@ REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 RAW="https://raw.githubusercontent.com/openwrt/luci/${BRANCH}/modules/luci-base/htdocs/luci-static/resources"
 
 RES="$DEST/luci-static/resources"
-MEDIA="$DEST/luci-static/fluentdesign"
+MEDIA="$DEST/luci-static/basalt"
 mkdir -p "$RES/icons" "$MEDIA/css" "$MEDIA/pattern"
 
 # Core runtime files as served by luci-base (jsmin-minified in real builds,
@@ -29,13 +29,13 @@ curl -fsSL --retry 3 "$RAW/baseclass.js" -o "$RES/baseclass.js" || rm -f "$RES/b
 cp "$REPO_ROOT/tests/harness/assets/icons/loading.svg" "$RES/icons/"
 
 # Theme menu renderer, stylesheet and media under test.
-cp "$REPO_ROOT/htdocs/luci-static/resources/menu-fluentdesign.js" "$RES/"
-cp "$REPO_ROOT/htdocs/luci-static/fluentdesign/css/cascade.css" "$MEDIA/css/"
-cp "$REPO_ROOT/htdocs/luci-static/fluentdesign/pattern/texture.svg" "$MEDIA/pattern/"
-cp "$REPO_ROOT/htdocs/luci-static/fluentdesign/logo.svg" "$MEDIA/"
-cp "$REPO_ROOT/htdocs/luci-static/fluentdesign/logo_48.png" "$MEDIA/"
-cp "$REPO_ROOT/htdocs/luci-static/fluentdesign/app-icon-192.png" "$MEDIA/"
-cp "$REPO_ROOT/htdocs/luci-static/fluentdesign/manifest.json" "$MEDIA/"
+cp "$REPO_ROOT/htdocs/luci-static/resources/menu-basalt.js" "$RES/"
+cp "$REPO_ROOT/htdocs/luci-static/basalt/css/cascade.css" "$MEDIA/css/"
+cp "$REPO_ROOT/htdocs/luci-static/basalt/pattern/texture.svg" "$MEDIA/pattern/"
+cp "$REPO_ROOT/htdocs/luci-static/basalt/logo.svg" "$MEDIA/"
+cp "$REPO_ROOT/htdocs/luci-static/basalt/logo_48.png" "$MEDIA/"
+cp "$REPO_ROOT/htdocs/luci-static/basalt/app-icon-192.png" "$MEDIA/"
+cp "$REPO_ROOT/htdocs/luci-static/basalt/manifest.json" "$MEDIA/"
 cp "$REPO_ROOT/tests/harness/shell.html" "$DEST/shell.html"
 
 echo "assembled site for luci branch '$BRANCH' at $DEST"

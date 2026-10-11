@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>FD shell harness</title>
-<link rel="icon" href="/luci-static/fluentdesign/logo_48.png" sizes="48x48">
-<link rel="icon" type="image/svg+xml" href="/luci-static/fluentdesign/logo.svg" sizes="any">
-<link rel="manifest" href="/luci-static/fluentdesign/manifest.json">
-<link rel="stylesheet" href="/luci-static/fluentdesign/css/cascade.css">
+<link rel="icon" href="/luci-static/basalt/logo_48.png" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/luci-static/basalt/logo.svg" sizes="any">
+<link rel="manifest" href="/luci-static/basalt/manifest.json">
+<link rel="stylesheet" href="/luci-static/basalt/css/cascade.css">
 <style>
 	/* Fixed report overlay; pointer-events:none so it never steals the
 	 * outside-click / rect measurements the checks perform. */
@@ -101,7 +101,7 @@ sessionStorage.setItem('luci-session-store', JSON.stringify({
 window.L = new LuCI({
 	scriptname: '/cgi-bin/luci',
 	resource: '/luci-static/resources',
-	media: '/luci-static/fluentdesign',
+	media: '/luci-static/basalt',
 	ubuspath: '/ubus',
 	sessionid: '00000000000000000000000000000000',
 	nodespec: { satisfied: true, readonly: false }
@@ -189,7 +189,7 @@ window.L = new LuCI({
 	}
 
 	/* boot the real theme menu module */
-	await L.require('menu-fluentdesign');
+	await L.require('menu-basalt');
 	for (let i = 0; i < 50 && !document.querySelector('#topmenu > li'); i++)
 		await wait(50);
 	await wait(100);
@@ -244,7 +244,7 @@ window.L = new LuCI({
 	check('sr-only h1 clipped', /inset/.test(getComputedStyle(document.querySelector('.fs-title')).clipPath));
 	check('footer present', /Powered by/.test(document.querySelector('.fs-footer').textContent));
 	check('old settings entry removed from the menu',
-		document.getElementById('topmenu').textContent.indexOf('FluentDesign 主题设置') === -1);
+		document.getElementById('topmenu').textContent.indexOf('Basalt 主题设置') === -1);
 
 	/* ============ mode menu / tabs ============ */
 	const modemenu = document.getElementById('modemenu');

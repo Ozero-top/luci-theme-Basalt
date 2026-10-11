@@ -1,6 +1,6 @@
-# luci-theme-FluentDesign
+# luci-theme-Basalt
 
-[![LuCI 兼容性矩阵](https://github.com/Ozero-top/luci-theme-FluentDesign/actions/workflows/luci-compat.yml/badge.svg?branch=main)](https://github.com/Ozero-top/luci-theme-FluentDesign/actions/workflows/luci-compat.yml)
+[![LuCI 兼容性矩阵](https://github.com/Ozero-top/luci-theme-Basalt/actions/workflows/luci-compat.yml/badge.svg?branch=main)](https://github.com/Ozero-top/luci-theme-Basalt/actions/workflows/luci-compat.yml)
 
 **简体中文** | [English](README.en.md)
 
@@ -19,22 +19,22 @@ v2 的视觉层源自 [luci-theme-footstrap](https://github.com/VizzleTF/luci-th
 ## 目录结构
 
 ```
-luci-theme-FluentDesign/
+luci-theme-Basalt/
 ├── Makefile                                  # OpenWrt 包定义（+luci-base）
 ├── build-css.mjs                             # 开发用：styles/ 切片拼接成 cascade.css
 ├── styles/                                   # CSS 源切片（@layer tokens/base/theme/page）
-├── ucode/template/themes/fluentdesign/       # ucode 模板（.ut）
+├── ucode/template/themes/basalt/       # ucode 模板（.ut）
 │   ├── head_meta.ut
 │   ├── header.ut / footer.ut                 # 管理界面外壳（容器开闭严格配对）
 │   └── sysauth.ut                            # 登录页（blank header/footer）
 ├── htdocs/luci-static/
-│   ├── fluentdesign/                         # 主题媒体根目录
+│   ├── basalt/                         # 主题媒体根目录
 │   │   ├── css/cascade.css                   # 唯一样式表（构建产物，随包提交）
 │   │   ├── pattern/texture.svg               # 内置原创暗纹
 │   │   ├── logo.svg / logo_48.png / app-icon-192.png / manifest.json
 │   └── resources/
-│       └── menu-fluentdesign.js              # 顶栏菜单渲染器（自包含，仅依赖 ui/baseclass）
-├── root/etc/uci-defaults/30_luci-theme-FluentDesign
+│       └── menu-basalt.js              # 顶栏菜单渲染器（自包含，仅依赖 ui/baseclass）
+├── root/etc/uci-defaults/30_luci-theme-Basalt
 └── tests/                                    # 跨分支浏览器测试 harness（1280 + 390 双视口）
 ```
 
@@ -42,8 +42,8 @@ luci-theme-FluentDesign/
 
 | 源路径                              | 目标设备路径                         |
 |-------------------------------------|---------------------------------------------|
-| `ucode/**`                          | `/usr/share/ucode/luci/template/themes/fluentdesign/` |
-| `htdocs/luci-static/fluentdesign/`  | `/www/luci-static/fluentdesign/`            |
+| `ucode/**`                          | `/usr/share/ucode/luci/template/themes/basalt/` |
+| `htdocs/luci-static/basalt/`  | `/www/luci-static/basalt/`            |
 | `htdocs/luci-static/resources/`     | `/www/luci-static/resources/`               |
 | `root/etc/uci-defaults/...`         | `/etc/uci-defaults/`（安装时执行一次）       |
 
@@ -81,7 +81,7 @@ ucode 模板：
 **LuCI 页面与第三方应用** —— 所有面向标准 LuCI 布局的官方模块和第三方应用
 都会在主题内正常渲染：外壳保持官方 DOM 契约
 （`#topmenu`、`#modemenu`、`#tabmenu`、`#indicators`、`#maincontent`），
-菜单/Tab/轮询指示器均由 `menu-fluentdesign.js` 按公开 `ui` API 渲染。
+菜单/Tab/轮询指示器均由 `menu-basalt.js` 按公开 `ui` API 渲染。
 即使第三方样式表自带全局重置（如 OpenClash），外壳几何也不会塌缩；
 同时声明了 iStoreOS 应用（快捷向导、iStore、VUM）读取的暗色外观契约，
 这些应用会自动以暗色渲染。
@@ -94,14 +94,14 @@ ucode 模板：
 
 ### 方式一：编入固件 / 通过 feed 构建
 
-1. 将包目录放入 buildroot 的 `package/luci-theme-fluentdesign`
+1. 将包目录放入 buildroot 的 `package/luci-theme-basalt`
    （或从自定义 feed 建立软链接）。
 2. 在 `make menuconfig` -> *LuCI* -> *Themes* 中选中
-   **luci-theme-FluentDesign**。
+   **luci-theme-Basalt**。
 3. 编译：
 
    ```sh
-   make package/luci-theme-fluentdesign/compile V=s
+   make package/luci-theme-basalt/compile V=s
    ```
 
    产物 `.ipk`（25.12 等 apk 发行版为 `.apk`）位于
@@ -111,9 +111,9 @@ ucode 模板：
 
 ```sh
 opkg update
-opkg install luci-theme-fluentdesign_*.ipk
+opkg install luci-theme-basalt_*.ipk
 # 基于 apk 的发行版（24.10-SNAPSHOT / 25.12）：
-# apk add --allow-untrusted luci-theme-fluentdesign-*.apk
+# apk add --allow-untrusted luci-theme-basalt-*.apk
 ```
 
 `uci-defaults` 脚本会注册主题并在全新安装时启用；包升级时绝不会覆盖用户
@@ -123,19 +123,19 @@ opkg install luci-theme-fluentdesign_*.ipk
 
 ```sh
 # 模板
-mkdir -p /usr/share/ucode/luci/template/themes/fluentdesign
-cp -a ucode/template/themes/fluentdesign/*.ut \
-      /usr/share/ucode/luci/template/themes/fluentdesign/
+mkdir -p /usr/share/ucode/luci/template/themes/basalt
+cp -a ucode/template/themes/basalt/*.ut \
+      /usr/share/ucode/luci/template/themes/basalt/
 
 # 静态资源
-mkdir -p /www/luci-static/fluentdesign
-cp -a htdocs/luci-static/fluentdesign/* /www/luci-static/fluentdesign/
-cp -a htdocs/luci-static/resources/menu-fluentdesign.js \
+mkdir -p /www/luci-static/basalt
+cp -a htdocs/luci-static/basalt/* /www/luci-static/basalt/
+cp -a htdocs/luci-static/resources/menu-basalt.js \
       /www/luci-static/resources/
 
 # 注册并启用
-uci set luci.themes.FluentDesign=/luci-static/fluentdesign
-uci set luci.main.mediaurlbase=/luci-static/fluentdesign
+uci set luci.themes.Basalt=/luci-static/basalt
+uci set luci.main.mediaurlbase=/luci-static/basalt
 uci commit luci
 ```
 
@@ -145,11 +145,11 @@ uci commit luci
 ### 启用 / 切换主题
 
 - 网页界面：**系统 -> 系统 -> 语言和风格 -> 设计** -> 选择
-  *FluentDesign*，然后刷新页面。
+  *Basalt*，然后刷新页面。
 - 命令行：
 
   ```sh
-  uci set luci.main.mediaurlbase=/luci-static/fluentdesign
+  uci set luci.main.mediaurlbase=/luci-static/basalt
   uci commit luci
   /etc/init.d/rpcd reload
   ```
@@ -183,7 +183,7 @@ node run-browser-tests.mjs http://127.0.0.1:8765/shell.html
 # 若主题正在使用，先切回官方主题：
 uci set luci.main.mediaurlbase=/luci-static/bootstrap
 uci commit luci
-opkg remove luci-theme-fluentdesign
+opkg remove luci-theme-basalt
 ```
 
 ## 版本记录
@@ -197,9 +197,9 @@ opkg remove luci-theme-fluentdesign
 | 1.1.2   | 2026-10-09 | 修复侧栏高度链与子菜单图标重叠 |
 | 1.1.1   | 2026-10-08 | 旧浏览器 CSS 回退与兼容性矩阵 |
 | 1.1.0   | 2026-10-08 | 主题设置页（UCI）             |
-| 1.0.0   | 2026-10-08 | Fluent Design 首个正式版本    |
+| 1.0.0   | 2026-10-08 | Basalt 首个正式版本    |
 
-2.0.0 为重大版本：旧版的主题设置页、`/etc/config/fluentdesign` 与自定义
+2.0.0 为重大版本：旧版的主题设置页、`/etc/config/basalt` 与自定义
 登录背景均已移除，主题不再读取任何 UCI 配置。
 
 ## 许可证

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*
- * Concatenate styles/ into htdocs/luci-static/fluentdesign/css/cascade.css.
+ * Concatenate styles/ into htdocs/luci-static/basalt/css/cascade.css.
  *
  * Mirrors footstrap's build-css.sh directory convention:
  *   styles/*.css        -> @layer tokens
@@ -53,7 +53,7 @@ for (const [layer, dir] of layers) {
 	if (body.trim()) out += `@layer ${layer} {\n${body}}\n`;
 }
 
-const dest = join(root, 'htdocs/luci-static/fluentdesign/css/cascade.css');
+const dest = join(root, 'htdocs/luci-static/basalt/css/cascade.css');
 mkdirSync(dirname(dest), { recursive: true });
 writeFileSync(dest, out);
 const rules = (out.match(/\{/g) || []).length;

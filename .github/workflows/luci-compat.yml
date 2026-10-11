@@ -15,8 +15,8 @@ on:
       - 'build-css.mjs'
       - 'styles/**'
       - 'ucode/**'
-      - 'htdocs/luci-static/fluentdesign/**'
-      - 'htdocs/luci-static/resources/menu-fluentdesign.js'
+      - 'htdocs/luci-static/basalt/**'
+      - 'htdocs/luci-static/resources/menu-basalt.js'
   pull_request:
   workflow_dispatch:
   # Weekly upstream drift patrol: even with no pushes, re-run against the

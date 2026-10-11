@@ -1,5 +1,5 @@
 {#
-	luci-theme-FluentDesign v2
+	luci-theme-Basalt v2
 
 	Login page: dark centered card (.fs-login, styles/pages/10-login.css),
 	vendored markup from luci-theme-footstrap (Apache-2.0). Renders through

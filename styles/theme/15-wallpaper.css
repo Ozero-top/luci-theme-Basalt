@@ -1,5 +1,5 @@
 @layer theme {
-	/* FluentDesign v2: a BUILT-IN, always-on body texture — an original
+	/* Basalt v2: a BUILT-IN, always-on body texture — an original
 	 * geometric motif (rounded tiles, rings and a tiny network graph). The
 	 * SVG is masked with the theme ink so only its alpha silhouette is
 	 * painted; source: pattern/texture.svg.
@@ -10,7 +10,7 @@
 	 * body/.fs-main/footer stay transparent; the attribute-qualified
 	 * selectors outrank the plain body/.fs-main/footer rules in 20-shell.css. */
 	:root {
-		--fs-pattern-url: url("/luci-static/fluentdesign/pattern/texture.svg");
+		--fs-pattern-url: url("/luci-static/basalt/pattern/texture.svg");
 		--fs-pattern-size: 260px;
 		--fs-pattern-strength: .22;
 	}

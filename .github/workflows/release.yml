@@ -40,5 +40,5 @@ jobs:
           make_latest: true
           overwrite_files: true
           files: |
-            dist/**/luci-theme-FluentDesign_*_all.ipk
-            dist/**/luci-theme-FluentDesign-*.apk
+            dist/**/luci-theme-Basalt_*_all.ipk
+            dist/**/luci-theme-Basalt-*.apk

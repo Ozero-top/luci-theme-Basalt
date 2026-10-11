@@ -1,5 +1,5 @@
 @layer theme {
-	/* FluentDesign v2: page cards are translucent so the built-in body
+	/* Basalt v2: page cards are translucent so the built-in body
 	 * texture reads through them. Only the big content surfaces are
 	 * affected — nav dropdowns, modal dialogs, the tab strip, alerts,
 	 * inputs and DATA TABLES keep their opaque surface for legibility.
