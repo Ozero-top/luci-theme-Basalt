@@ -7,8 +7,8 @@
 		gap: var(--fs-space-3);
 		/* nowrap or flexbox wraps the BAR itself instead of the menu's own pills — the signal fitChrome measures */
 		flex-wrap: nowrap;
-		/* aligns the bar to .fs-content so the brand/menu line up with the headings below */
-		padding: 0 max(20px, calc((100% - var(--fs-content-max)) / 2 + var(--fs-content-pad)));
+		/* Fluent mock: a fixed 32px bar gutter — the content column's 64px pad is wider by design */
+		padding: 0 var(--fs-space-8);
 	}
 
 	/* flex:1 opens the gap pushing the right cluster to the column's edge */
@@ -16,7 +16,8 @@
 		order: 2; flex: 1 1 auto; margin-inline-start: var(--fs-space-2);
 	}
 	:root[data-layout="top"] .fs-sidebar #indicators,
-	:root[data-layout="top"] .fs-themerow,
+	:root[data-layout="top"] .fs-search,
+	:root[data-layout="top"] .fs-vr,
 	:root[data-layout="top"] .fs-logout { order: 3; margin-inline-start: 0; }
 
 	/* The bar keeps the brand on one line: without a flex brandrow, the
@@ -49,8 +50,6 @@
 		}
 	}
 
-	:root[data-layout="top"] .fs-content { padding-top: var(--fs-space-6); }
-
 	/* .fs-bar-stack: set by fitChrome (fs-chrome.js), not a media query — same reasoning as the header above */
 	:root[data-layout="top"] .fs-sidebar.fs-bar-stack {
 		flex-wrap: wrap; height: auto; padding: var(--fs-space-2-5) var(--fs-space-4);
@@ -59,13 +58,12 @@
 		order: 3; flex: 1 1 100%; margin-inline-start: 0;
 	}
 	:root[data-layout="top"] .fs-sidebar.fs-bar-stack #indicators,
-	:root[data-layout="top"] .fs-sidebar.fs-bar-stack .fs-themerow,
+	:root[data-layout="top"] .fs-sidebar.fs-bar-stack .fs-search,
+	:root[data-layout="top"] .fs-sidebar.fs-bar-stack .fs-vr,
 	:root[data-layout="top"] .fs-sidebar.fs-bar-stack .fs-logout { order: 2; }
 	:root[data-layout="top"] .fs-sidebar.fs-bar-stack #indicators,
-	:root[data-layout="top"] .fs-sidebar.fs-bar-stack .fs-themerow { margin-inline-start: auto; }
-	:root[data-layout="top"] .fs-sidebar.fs-bar-stack #indicators:not(:empty) ~ .fs-themerow { margin-inline-start: 0; }
-	/* only the FIRST far-edge item keeps the auto margin, restated here — base guard is out-specified (0,4,0 vs 0,2,0) */
-	:root[data-layout="top"] .fs-sidebar.fs-bar-stack .fs-themerow ~ .fs-themerow { margin-inline-start: 0; }
+	:root[data-layout="top"] .fs-sidebar.fs-bar-stack .fs-search { margin-inline-start: auto; }
+	:root[data-layout="top"] .fs-sidebar.fs-bar-stack #indicators:not(:empty) ~ .fs-search { margin-inline-start: 0; }
 
 	/* .fs-ind-compact/.fs-bar-actrow live with the bar in 20-shell.css too — only the top delta lives here */
 
@@ -78,6 +76,17 @@
 			flex-wrap: wrap;
 			height: auto;
 			padding: var(--fs-space-2-5) var(--fs-space-3);
+			align-items: center;
+		}
+		/* the desktop Pivot look (stretch items + the 26px underline) reverts to pills here:
+		 * a scroll strip has no room for a baseline underline, and stretch would fight the wrap */
+		:root[data-layout="top"] .fs-sidebar ul.nav > li > a {
+			padding: var(--fs-space-1-5) var(--fs-space-3);
+			border-radius: var(--fs-radius);
+		}
+		:root[data-layout="top"] .fs-sidebar ul.nav > li > a.active::after { content: none; }
+		:root[data-layout="top"] .fs-sidebar ul.nav > li > a.active {
+			background: var(--fs-accent-soft); color: var(--fs-accent);
 		}
 		:root[data-layout="top"] .fs-sidebar ul.nav {
 			order: 3;
@@ -99,10 +108,23 @@
 		}
 		:root[data-layout="top"] .fs-sidebar ul.nav::-webkit-scrollbar { display: none; }
 		:root[data-layout="top"] .fs-sidebar #indicators,
+		:root[data-layout="top"] .fs-search,
+		:root[data-layout="top"] .fs-vr,
 		:root[data-layout="top"] .fs-logout {
 			order: 2;
 			margin-inline-start: 0;
 		}
 		:root[data-layout="top"] .fs-sidebar #indicators { margin-inline-start: auto; }
+		/* the desktop field (248px) crowds the phone bar — give back its kbd first */
+		:root[data-layout="top"] .fs-search-field { width: 180px; }
+		:root[data-layout="top"] .fs-search-field kbd { display: none; }
+	}
+
+	/* phone: the field collapses to a square icon trigger, the panel right-aligns */
+	@media (max-width: 560px) {
+		:root[data-layout="top"] .fs-search-field { width: var(--fs-ctl-h); padding: 0; justify-content: center; }
+		:root[data-layout="top"] .fs-search-field .fs-ph { display: none; }
+		:root[data-layout="top"] .fs-logout .fs-who { display: none; }
+		:root[data-layout="top"] .fs-logout { padding: 0 var(--fs-space-2) 0 var(--fs-space-1); }
 	}
 }

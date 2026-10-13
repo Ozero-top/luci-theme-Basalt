@@ -34,20 +34,19 @@
 
 body.logged-in .fs-sidebar { padding: var(--fs-space-2-5) var(--fs-space-4); }
 :root[data-layout="top"] body.logged-in .fs-sidebar {
-	padding: 0 max(20px, calc((100% - var(--fs-content-max)) / 2 + var(--fs-content-pad)));
+	padding: 0 var(--fs-space-8);
 }
 :root[data-layout="top"] body.logged-in .fs-sidebar ul.nav { margin-inline-start: var(--fs-space-2); }
 body.logged-in .fs-sidebar ul.nav, body.logged-in .fs-sidebar #modemenu { margin: 0; padding: 0; }
-body.logged-in .fs-sidebar ul.nav > li > a { padding: var(--fs-space-1-5) var(--fs-space-3); }
+body.logged-in .fs-sidebar ul.nav > li > a { padding: 0 var(--fs-space-4); }
 body.logged-in .fs-sidebar ul.nav ul, body.logged-in .fs-sidebar ul.nav > li.open > ul { margin: 0; padding: var(--fs-space-2); }
 body.logged-in .fs-sidebar ul.nav ul a { padding: var(--fs-space-2) var(--fs-space-3); }
 
 /* exactly one member of the far-edge cluster keeps the auto gap (mirrors 20-shell.css) */
 body.logged-in .fs-sidebar #indicators { margin-inline-start: auto; }
-body.logged-in .fs-themerow { margin-inline-start: auto; }
-body.logged-in .fs-sidebar #indicators:not(:empty) ~ .fs-themerow { margin-inline-start: 0; }
-body.logged-in .fs-themerow ~ .fs-themerow { margin-inline-start: 0; }
-:root[data-layout="top"] body.logged-in .fs-sidebar #indicators, :root[data-layout="top"] body.logged-in .fs-themerow, :root[data-layout="top"] body.logged-in .fs-logout { margin-inline-start: 0; }
+body.logged-in .fs-search { margin-inline-start: auto; }
+body.logged-in .fs-sidebar #indicators:not(:empty) ~ .fs-search { margin-inline-start: 0; }
+:root[data-layout="top"] body.logged-in .fs-sidebar #indicators, :root[data-layout="top"] body.logged-in .fs-search, :root[data-layout="top"] body.logged-in .fs-vr, :root[data-layout="top"] body.logged-in .fs-logout { margin-inline-start: 0; }
 body.logged-in .fs-indicators .label, body.logged-in .fs-indicators [data-indicator], body.logged-in #indicators .label, body.logged-in #indicators [data-indicator] { padding: 0 var(--fs-space-3); }
 
 /* skip link / screen-reader-only chrome */
@@ -59,12 +58,11 @@ body.logged-in .fs-sr { margin: -1px; }
 
 body.logged-in .fs-content {
 	margin: 0 auto;
-	padding: var(--fs-space-5) var(--fs-content-pad);
+	padding: calc(var(--fs-space-7) + var(--fs-space-0-5)) var(--fs-content-pad) var(--fs-space-10);
 }
-:root[data-layout="top"] body.logged-in .fs-content { padding-top: var(--fs-space-6); }
 body.logged-in footer { margin-top: auto; padding: var(--fs-space-3-5) var(--fs-content-pad); }
 
-body.logged-in .alert-message { margin-bottom: var(--fs-space-2); padding: var(--fs-space-3-5) var(--fs-space-4); }
+body.logged-in .alert-message { margin-bottom: var(--fs-space-2); padding: var(--fs-space-3) var(--fs-space-4); }
 body.logged-in .fs-main > .alert-message { margin: var(--fs-space-4) auto 0; }
 body.logged-in .alert-message :is(h2, h3, h4, h5, h6) { margin: 0 0 var(--fs-space-1); }
 body.logged-in .alert-message p { margin: var(--fs-space-1) 0; }
@@ -78,10 +76,10 @@ body.logged-in .alert-message .btn, body.logged-in .alert-message .cbi-button { 
 
 body.logged-in #tabmenu ul.tabs, body.logged-in ul.cbi-tabmenu.mode, body.logged-in .tabs, body.logged-in .cbi-tabmenu {
 	margin: 0 0 var(--fs-card-gap);
-	padding: var(--fs-space-2);
+	padding: 0;
 }
-body.logged-in .cbi-section .tabs, body.logged-in .cbi-section .cbi-tabmenu:not(.mode):not(.map) { padding: var(--fs-space-1-5); }
-body.logged-in #tabmenu ul.tabs > li > a, body.logged-in ul.cbi-tabmenu.mode > li > a, body.logged-in .tabs > li > a, body.logged-in .cbi-tabmenu > li > a { padding: var(--fs-space-2) var(--fs-space-3-5); }
+body.logged-in .cbi-section .tabs, body.logged-in .cbi-section .cbi-tabmenu:not(.mode):not(.map) { padding: 0; }
+body.logged-in #tabmenu ul.tabs > li > a, body.logged-in ul.cbi-tabmenu.mode > li > a, body.logged-in .tabs > li > a, body.logged-in .cbi-tabmenu > li > a { padding: var(--fs-space-2-5) var(--fs-space-1) var(--fs-space-3); }
 body.logged-in .cbi-tab-descr { margin: calc(var(--fs-space-2) * -1) 0 var(--fs-space-4) 0; }
 body.logged-in .cbi-tab-disabled[data-errors]::after {
 	margin-inline-end: var(--fs-space-1);
@@ -126,7 +124,12 @@ body.logged-in .cbi-map > h2 + .cbi-map-descr, body.logged-in #view > h2 + .cbi-
 
 body.logged-in fieldset { margin-bottom: var(--fs-space-2); padding-top: var(--fs-space-2); }
 body.logged-in fieldset legend { padding-top: var(--fs-space-5); }
-body.logged-in .cbi-section { padding: var(--fs-card-pad); margin-bottom: var(--fs-card-gap); }
+body.logged-in .cbi-section { padding: var(--fs-card-pad); }
+/* overview grid items (menu-basalt.js's .fs-ovl, styles/pages/20-overview.css) carry no
+ * stock flow spacing — the grid's own gap is the rhythm; excluded here and mirrored below */
+body.logged-in .cbi-section:not(.fs-ovl > *) { margin-bottom: var(--fs-card-gap); }
+body.logged-in .fs-ovl { margin-bottom: var(--fs-card-gap); }
+body.logged-in .fs-ovl > .cbi-section { margin: 0; }
 body.logged-in .cbi-section > .cbi-title { margin-bottom: var(--fs-space-3); }
 /* zero override beats the generic fieldset/legend rules above, as the layered theme rule does */
 body.logged-in .cbi-section > .cbi-title h3, body.logged-in .cbi-section > h3:first-child, body.logged-in .cbi-section > legend { margin: 0; padding: 0; }
@@ -158,7 +161,7 @@ body.logged-in .cbi-section-error ul { margin: 0 0 0 var(--fs-space-5); }
 body.logged-in .cbi-section .table .td, body.logged-in .cbi-section .table .th {
 	padding: var(--fs-space-2-5) var(--fs-space-4) var(--fs-space-2-5) 0;
 }
-body.logged-in .cbi-section .table:is([id], .fs-dt) .td, body.logged-in .cbi-section .table:is([id], .fs-dt) .th, body.logged-in table.fs-dt .td, body.logged-in table.fs-dt .th { padding: var(--fs-space-2-5) var(--fs-space-3); }
+body.logged-in .cbi-section .table:is([id], .fs-dt) .td, body.logged-in .cbi-section .table:is([id], .fs-dt) .th, body.logged-in table.fs-dt .td, body.logged-in table.fs-dt .th { padding: var(--fs-space-3) calc(var(--fs-space-4) + var(--fs-space-0-5)); }
 body.logged-in .table.cbi-section-table .cbi-section-filter { padding: var(--fs-space-1) var(--fs-space-1-5); }
 body.logged-in .cbi-section-table .th, body.logged-in .cbi-section-table .td, body.logged-in .table.cbi-section-table .th, body.logged-in .table.cbi-section-table .td, body.logged-in .table.cbi-section-table .tr::before { padding: var(--fs-space-2) var(--fs-space-3) var(--fs-space-2) 0; }
 body.logged-in .table.cbi-section-table:not(.cbi-section *):not(.cbi-section-node *) .th, body.logged-in .table.cbi-section-table:not(.cbi-section *):not(.cbi-section-node *) .td { padding: var(--fs-space-2-5) var(--fs-space-3); }
@@ -203,6 +206,25 @@ body.logged-in .cbi-page-actions {
 	padding: var(--fs-space-2) 0;
 	margin: 0 0 var(--fs-card-gap);
 }
+/* the Fluent page head re-parents the stock bar (menu-basalt.js); the
+ * head owns the rhythm, the bar contributes none */
+body.logged-in .fs-pg-actions .cbi-page-actions {
+	padding: 0;
+	margin: 0;
+}
+/* the head itself and the sectioned cards' head strip are
+ * layout-bearing too: a hostile unlayered reset must not collapse them */
+body.logged-in .fs-pghead {
+	padding: 0;
+	margin: 0 0 var(--fs-space-5);
+}
+body.logged-in .fs-crumbs { padding: 0; margin: 0 0 6px; }
+body.logged-in .fs-pg-title { padding: 0; margin: 0; }
+body.logged-in .fs-card-head {
+	padding: var(--fs-space-3) var(--fs-card-pad);
+	margin: calc(var(--fs-card-pad) * -1) calc(var(--fs-card-pad) * -1) var(--fs-space-3);
+}
+body.logged-in .fs-card-more { margin: 0; margin-inline-start: auto; }
 body.logged-in .cbi-page-actions .cbi-button, body.logged-in .cbi-page-actions .btn { padding: 0 var(--fs-space-5); }
 body.logged-in .cbi-page-actions > :not([method="post"]):not(.cbi-button-apply):not(.cbi-button-negative):not(.cbi-button-save):not(.cbi-button-reset) {
 	margin-inline-end: var(--fs-space-1);
@@ -226,6 +248,13 @@ body.logged-in .cbi-input-text, body.logged-in .cbi-input-password, body.logged-
 }
 body.logged-in select, body.logged-in select.cbi-input-select, body.logged-in .cbi-value-field select {
 	padding: var(--fs-space-2) var(--fs-space-8) var(--fs-space-2) var(--fs-space-3);
+}
+/* focus mirror: the layered focus rule thickens the bottom edge to 2px INSIDE the same envelope
+ * ((8+1) -> (7+2)); this unlayered pinned padding would beat that compensation without its own
+ * mirror. Typed fields + select only — the broad `input:focus:not(...)` fallback stays unmirrored
+ * (LuCI ships no bare input; file/range are excluded from the fallback itself). */
+body.logged-in .cbi-input-text:focus, body.logged-in .cbi-input-password:focus, body.logged-in .cbi-input-textarea:focus, body.logged-in .cbi-section-create-name:focus, body.logged-in input[type="text"]:focus, body.logged-in input[type="password"]:focus, body.logged-in input[type="number"]:focus, body.logged-in input[type="email"]:focus, body.logged-in input[type="url"]:focus, body.logged-in input[type="search"]:focus, body.logged-in input[type="tel"]:focus, body.logged-in input[type="date"]:focus, body.logged-in input[type="time"]:focus, body.logged-in input[type="datetime-local"]:focus, body.logged-in input[type="month"]:focus, body.logged-in input[type="week"]:focus, body.logged-in input[type="color"]:focus, body.logged-in textarea:focus, body.logged-in select:focus, body.logged-in select.cbi-input-select:focus, body.logged-in .cbi-value-field select:focus {
+	padding-bottom: calc(var(--fs-space-2) - 1px);
 }
 
 body.logged-in .cbi-dropdown > ul { margin: 0; padding: 0; }

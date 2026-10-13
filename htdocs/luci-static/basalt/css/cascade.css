@@ -20,22 +20,28 @@
 	 * docs/design-system.md "Two tiers, and the split is load-bearing". */
 	:root {
 		/* palette colours live in 03-palettes.css */
-		--fs-shadow-pop: 0 12px 34px rgba(0,0,0,.30);	/* pop surfaces: menus, dropdown lists, the select picker */
+		/* Fluent elevation: s2 rest / s-hover lifted / s8 pop (docs: fluent.css) */
+		--fs-shadow-card: 0 1.6px 3.6px rgba(0,0,0,.13), 0 .3px .9px rgba(0,0,0,.10);
+		--fs-shadow-hover: 0 6.4px 14.4px rgba(0,0,0,.18), 0 1.2px 3.6px rgba(0,0,0,.14);
+		--fs-shadow-pop: 0 6.4px 14.4px rgba(0,0,0,.13), 0 1.2px 3.6px rgba(0,0,0,.10);	/* pop surfaces: menus, dropdown lists, the select picker */
 		/* which of the three a control takes: docs/design-system.md "The derived ladder" */
-		--fs-focus-ring: 0 0 0 3px var(--fs-accent-soft);
-		--fs-focus-ring-solo: 0 0 0 2px var(--fs-panel), 0 0 0 5px var(--fs-accent);
+		--fs-focus-ring: 0 0 0 3px color-mix(in srgb, var(--fs-accent) 18%, transparent);
+		--fs-focus-ring-solo: 0 0 0 2px var(--fs-panel), 0 0 0 4px var(--fs-accent);
 		--fs-focus-ring-invalid: 0 0 0 3px var(--fs-danger-fill);
 		/* opaque, not a tint (4.21:1 in dark); pinned by tools/mirror.mjs
 		 * (`selected-row/paint`), docs/css.md "@mirror" */
 		--fs-row-rail: inset 2px 0 0 var(--fs-accent);
+		/* Fluent table row hover: a whisper of accent, not a grey step */
+		--fs-row-hover: color-mix(in srgb, var(--fs-accent) 6%, transparent);
 
 		/* every separator is this one line, stated once rather than in 69 longhand declarations */
 		--fs-hairline: 1px solid var(--fs-border);
 		/* ring and border-colour transition together, or the ring arrives before the edge does */
-		--fs-field-transition: border-color var(--fs-dur), box-shadow var(--fs-dur);
+		--fs-field-transition: border-color var(--fs-dur), box-shadow var(--fs-dur), transform var(--fs-dur-move);
 
-		/* the theme's one colour literal on purpose. docs/design-system.md "The derived ladder". */
-		--fs-scrim: rgba(0, 0, 0, .7);
+		/* the theme's one colour literal on purpose. docs/design-system.md "The derived ladder".
+		 * Fluent light pages overlay at 40%, not 70%. */
+		--fs-scrim: rgba(0, 0, 0, .4);
 
 		/* Role tint ladder, derived so it follows the palette. docs/design-system.md "The derived
 		 * ladder". */
@@ -64,35 +70,36 @@
 		/* direction flips by mode: light darkens, dark brightens (`filter` recolours the ink too) */
 		--fs-hover-lift: brightness(.90);
 
-		/* four durations, no easing token. docs/design-system.md "Scales" ("Motion") */
+		/* four durations + one Fluent ease. docs/design-system.md "Scales" ("Motion") */
+		--fs-ease: cubic-bezier(.33, 0, .15, 1);	/* the mock's standard ease */
 		--fs-dur: .15s;		/* a state change: colour, border, shadow, background, filter */
 		--fs-dur-move: .2s;	/* something that moves or unfolds: transform, max-height */
 		--fs-dur-fade: .25s;	/* a transient thing fading in or out: spinner, notification */
 		--fs-dur-fill: .4s;	/* a progress bar growing to its value */
-		--fs-content-max: 1280px;	/* content column cap */
-		/* also read by the bar's centering calc and the notification-width calc */
-		--fs-content-pad: calc(28px * var(--fs-density-space));
+		--fs-content-max: none;	/* the Fluent mock runs full width at 1920 — no column cap */
+		/* also read by the notification-width calc */
+		--fs-content-pad: calc(64px * var(--fs-density-space));
 		/* tokens, not literals — fs-chrome.js's fitShell() reads them back. docs/design-system.md
 		 * "Scales" ("Shell geometry"). */
 		--fs-sidebar-w: calc(224px * var(--fs-density-box));		/* the expanded vertical sidebar's column */
 		--fs-rail-w: calc(68px * var(--fs-density-box));		/* ...and the same sidebar collapsed to its icon rail */
 		--fs-content-min: 500px;	/* below this a content column stops being readable */
 		/* opaque on purpose. docs/design-system.md "The derived ladder". */
-		--fs-bar-bg: var(--fs-panel);
+		--fs-bar-bg: rgba(255, 255, 255, .78);	/* acrylic over the page, paired with blur in theme/20-shell.css */
 		/* base/10-reset.css's scroll-margin must equal this or an in-page jump lands under the bar */
 		/* drawn, not fetched. docs/design-system.md "Two glyphs drawn as tokens, not fetched". */
 		--fs-select-chevron:
 			linear-gradient(-45deg, transparent 45%, var(--fs-dim) 45% 55%, transparent 55%),
 			linear-gradient(45deg, transparent 45%, var(--fs-dim) 45% 55%, transparent 55%);
-		--fs-bar-h: calc(46px * var(--fs-density-box));
-		/* logo box, .fs-themerow controls, Log out and the poll pill share this size */
-		--fs-btn-size: calc(34px * var(--fs-density-box));
+		--fs-bar-h: calc(64px * var(--fs-density-box));
+		/* logo box, the search field, Log out and the poll pill share this size */
+		--fs-btn-size: calc(38px * var(--fs-density-box));
 
 		/* one base (Appearance -> Rounding); three radii scale from it */
-		--fs-radius-base: 12px;
+		--fs-radius-base: 8px;
 		--fs-radius-lg: var(--fs-radius-base);				/* cards, panels, modals, table frame, popovers */
-		--fs-radius: calc(var(--fs-radius-base) * 5 / 6);	/* controls: inputs, buttons, dropdowns, tabs (10 @12) */
-		--fs-radius-sm: calc(var(--fs-radius-base) * 2 / 3);	/* chips, code, small insets, rail toggle (8 @12) */
+		--fs-radius: calc(var(--fs-radius-base) * 3 / 4);	/* controls: inputs, buttons, dropdowns, tabs (6 @8) */
+		--fs-radius-sm: calc(var(--fs-radius-base) * 1 / 2);	/* chips, code, small insets, rail toggle (4 @8) */
 		--fs-radius-pill: 999px;					/* pills, toggles, badges — always round */
 
 		/* .cbi-section's own gutter; theme/45-misc.css reads it back to undo it (bleed to the card edge) */
@@ -100,8 +107,8 @@
 		/* vertical rhythm between cards: .cbi-section, tab groups, alerts, action bars */
 		--fs-card-gap: calc(16px * var(--fs-density-space));
 
-		--fs-font-sans: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-		--fs-font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+		--fs-font-sans: "Segoe UI Variable Text", "Segoe UI", -apple-system, "Microsoft YaHei UI", "PingFang SC", system-ui, sans-serif;
+		--fs-font-mono: "Cascadia Code", "Cascadia Mono", Consolas, ui-monospace, monospace;
 
 		/* five steps, ~1.25 apart */
 		/* three multipliers, one knob each for text/air/boxes */
@@ -117,7 +124,7 @@
 		/* rounded in @supports below (round() is younger than the floor) */
 		--fs-type-2xs: calc(10px * var(--fs-density-type));
 		--fs-type-xs: calc(11px * var(--fs-density-type));	/* eyebrow, badges, tooltips, dense metadata */
-		--fs-type: calc(13px * var(--fs-density-type));		/* body, tables, fields, menu items — the base */
+		--fs-type: calc(14px * var(--fs-density-type));		/* body, tables, fields, menu items — the base */
 		--fs-type-lg: calc(16px * var(--fs-density-type));	/* section titles (h3/legend), alert headings */
 		--fs-type-xl: calc(20px * var(--fs-density-type));	/* page titles */
 		--fs-type-2xl: calc(26px * var(--fs-density-type));	/* h1 — only a third-party app emits a bare one */
@@ -150,8 +157,8 @@
 		--fs-space-8: calc(32px * var(--fs-density-space));
 		--fs-space-10: calc(40px * var(--fs-density-space));
 
-		/* every single-line field's height, derived not measured */
-		--fs-control-h: calc(var(--fs-type) * var(--fs-leading) + var(--fs-space-1) * 2 + 2px);
+		/* every single-line field's height — the Fluent field box, 40px */
+		--fs-control-h: calc(40px * var(--fs-density-box));
 
 		/* ceiling for an elastic `.cbi-value-field` (flex: 1) — a COLUMN width, off the 4px scale */
 		--fs-field-max: 440px;
@@ -213,11 +220,11 @@
 		:root {
 			--fs-type-2xs: calc(round(10px * var(--fs-density-type), 1px));
 			--fs-type-xs: calc(round(11px * var(--fs-density-type), 1px));
-			--fs-type: calc(round(13px * var(--fs-density-type), 1px));
+			--fs-type: calc(round(14px * var(--fs-density-type), 1px));
 			--fs-type-lg: calc(round(16px * var(--fs-density-type), 1px));
 			--fs-type-xl: calc(round(20px * var(--fs-density-type), 1px));
 			--fs-type-2xl: calc(round(26px * var(--fs-density-type), 1px));
-			--fs-control-h: calc(round(up, calc(var(--fs-type) * var(--fs-leading) + var(--fs-space-1) * 2 + 2px), 4px));
+			--fs-control-h: calc(round(up, calc(40px * var(--fs-density-box)), 4px));
 		}
 	}
 
@@ -247,48 +254,63 @@
 
 	/* no component bridge (--*-hsl, --*-rgb): docs/conventions.md "Writing CSS" ("No colour
 	 * literals"). The one surviving --*-rgb is luci-mod-network's own (base/95-luci.css), not ours. */
-	/* Basalt v2: single dark palette, vendored from footstrap's dark
-	 * "footstrap/GitHub Primer dimmed" colourway. Light mode, the alternate
-	 * palettes and every appearance axis were intentionally removed — the
-	 * chrome hardcodes <html data-darkmode="true">. */
+	/* Basalt v2.1: single light palette, Microsoft Fluent 2 colourway.
+	 * Light mode, the alternate palettes and every appearance axis were
+	 * intentionally removed — the chrome hardcodes <html data-darkmode="false">. */
 	:root {
 		/* surfaces */
-		--fs-bg: #1c2128;
-		--fs-bg-base: #1c2128;
-		--fs-panel: #22272e;
-		--fs-panel-base: #22272e;
-		--fs-panel2: #2d333b;
-		--fs-panel2-base: #2d333b;
-		--fs-border: #444c56;
-		--fs-border-base: #444c56;
-		--fs-track: #373e47;
+		--fs-bg: #f3f2f1;
+		--fs-bg-base: #f3f2f1;
+		--fs-panel: #ffffff;
+		--fs-panel-base: #ffffff;
+		--fs-panel2: #faf9f8;
+		--fs-panel2-base: #faf9f8;
+		--fs-border: #e1e1e1;
+		--fs-border-base: #e1e1e1;
+		--fs-border-strong: #8a8886;		/* control edges: buttons, fields */
+		--fs-border-strong-hover: #6b6a69;
+		--fs-track: #ebebea;
 
 		/* ink */
-		--fs-text: #adbac7;
-		--fs-dim: #8f9cab;
-		--fs-faint: #959ca5;
+		--fs-text: #323130;
+		--fs-dim: #605e5c;
+		--fs-faint: #a19f9d;
 
-		/* accent + status (dark fills use dark ink #10151c) */
-		--fs-accent: #569df5;
-		--fs-accent-base: #569df5;
+		/* accent + status (solid fills carry white ink) */
+		--fs-accent: #0078d4;
+		--fs-accent-base: #0078d4;
+		/* brand mark gradient stops (mock: 160deg, a -> b 58% -> c) */
+		--fs-brand-a: #2b95e0;
+		--fs-brand-b: #0078d4;
+		--fs-brand-c: #005a9e;
 		--fs-accent-soft: color-mix(in srgb, var(--fs-accent) 15%, transparent);
-		--fs-good: #5aad5d;
-		--fs-good-base: #5aad5d;
-		--fs-warn: #c79128;
-		--fs-warn-base: #c79128;
-		--fs-danger: #ea7a74;
-		--fs-danger-base: #ea7a74;
-		--fs-on-accent: #10151c;
-		--fs-on-good: #10151c;
-		--fs-on-warn: #10151c;
-		--fs-on-danger: #10151c;
+		--fs-good: #0f7b0f;
+		--fs-good-base: #0f7b0f;
+		--fs-warn: #8a6411;
+		--fs-warn-base: #8a6411;
+		--fs-danger: #e81123;
+		--fs-danger-base: #e81123;
+		--fs-on-accent: #ffffff;
+		--fs-on-good: #ffffff;
+		--fs-on-warn: #ffffff;
+		--fs-on-danger: #ffffff;
 
-		/* placeholder ink (dark mix) */
-		--fs-placeholder-mix: 64%;
+		/* Fluent status washes — badge/alert tints deeper than the 12-18% mixes */
+		--fs-accent-bg: #deecf9;
+		--fs-good-bg: #dff6dd;
+		--fs-warn-bg: #fff4ce;
+		--fs-danger-bg: #fde7e9;
+
+		/* Fluent control states (mock --blue-hover / .switch off fill / row separator) */
+		--fs-accent-hover: #106ebe;
+		--fs-switch-off: #b9b7b5;
+		--fs-row-line: #f0efee;
+
+		/* placeholder ink (light mix) */
+		--fs-placeholder-mix: 30%;
 		--fs-placeholder: color-mix(in oklch, var(--fs-text) var(--fs-placeholder-mix), var(--fs-panel2));
 
-		/* inert wallpaper axes — the built-in cat pattern is always on,
-		 * see theme/15-wallpaper.css */
+		/* inert wallpaper axes — see theme/15-wallpaper.css */
 		--fs-login-bg-url: none;
 		--fs-photo-dim: 74%;
 		--fs-photo-scrim: color-mix(in srgb, var(--fs-bg-base) var(--fs-photo-dim), transparent);
@@ -1901,20 +1923,19 @@
 
 body.logged-in .fs-sidebar { padding: var(--fs-space-2-5) var(--fs-space-4); }
 :root[data-layout="top"] body.logged-in .fs-sidebar {
-	padding: 0 max(20px, calc((100% - var(--fs-content-max)) / 2 + var(--fs-content-pad)));
+	padding: 0 var(--fs-space-8);
 }
 :root[data-layout="top"] body.logged-in .fs-sidebar ul.nav { margin-inline-start: var(--fs-space-2); }
 body.logged-in .fs-sidebar ul.nav, body.logged-in .fs-sidebar #modemenu { margin: 0; padding: 0; }
-body.logged-in .fs-sidebar ul.nav > li > a { padding: var(--fs-space-1-5) var(--fs-space-3); }
+body.logged-in .fs-sidebar ul.nav > li > a { padding: 0 var(--fs-space-4); }
 body.logged-in .fs-sidebar ul.nav ul, body.logged-in .fs-sidebar ul.nav > li.open > ul { margin: 0; padding: var(--fs-space-2); }
 body.logged-in .fs-sidebar ul.nav ul a { padding: var(--fs-space-2) var(--fs-space-3); }
 
 /* exactly one member of the far-edge cluster keeps the auto gap (mirrors 20-shell.css) */
 body.logged-in .fs-sidebar #indicators { margin-inline-start: auto; }
-body.logged-in .fs-themerow { margin-inline-start: auto; }
-body.logged-in .fs-sidebar #indicators:not(:empty) ~ .fs-themerow { margin-inline-start: 0; }
-body.logged-in .fs-themerow ~ .fs-themerow { margin-inline-start: 0; }
-:root[data-layout="top"] body.logged-in .fs-sidebar #indicators, :root[data-layout="top"] body.logged-in .fs-themerow, :root[data-layout="top"] body.logged-in .fs-logout { margin-inline-start: 0; }
+body.logged-in .fs-search { margin-inline-start: auto; }
+body.logged-in .fs-sidebar #indicators:not(:empty) ~ .fs-search { margin-inline-start: 0; }
+:root[data-layout="top"] body.logged-in .fs-sidebar #indicators, :root[data-layout="top"] body.logged-in .fs-search, :root[data-layout="top"] body.logged-in .fs-vr, :root[data-layout="top"] body.logged-in .fs-logout { margin-inline-start: 0; }
 body.logged-in .fs-indicators .label, body.logged-in .fs-indicators [data-indicator], body.logged-in #indicators .label, body.logged-in #indicators [data-indicator] { padding: 0 var(--fs-space-3); }
 
 /* skip link / screen-reader-only chrome */
@@ -1926,12 +1947,11 @@ body.logged-in .fs-sr { margin: -1px; }
 
 body.logged-in .fs-content {
 	margin: 0 auto;
-	padding: var(--fs-space-5) var(--fs-content-pad);
+	padding: calc(var(--fs-space-7) + var(--fs-space-0-5)) var(--fs-content-pad) var(--fs-space-10);
 }
-:root[data-layout="top"] body.logged-in .fs-content { padding-top: var(--fs-space-6); }
 body.logged-in footer { margin-top: auto; padding: var(--fs-space-3-5) var(--fs-content-pad); }
 
-body.logged-in .alert-message { margin-bottom: var(--fs-space-2); padding: var(--fs-space-3-5) var(--fs-space-4); }
+body.logged-in .alert-message { margin-bottom: var(--fs-space-2); padding: var(--fs-space-3) var(--fs-space-4); }
 body.logged-in .fs-main > .alert-message { margin: var(--fs-space-4) auto 0; }
 body.logged-in .alert-message :is(h2, h3, h4, h5, h6) { margin: 0 0 var(--fs-space-1); }
 body.logged-in .alert-message p { margin: var(--fs-space-1) 0; }
@@ -1945,10 +1965,10 @@ body.logged-in .alert-message .btn, body.logged-in .alert-message .cbi-button { 
 
 body.logged-in #tabmenu ul.tabs, body.logged-in ul.cbi-tabmenu.mode, body.logged-in .tabs, body.logged-in .cbi-tabmenu {
 	margin: 0 0 var(--fs-card-gap);
-	padding: var(--fs-space-2);
+	padding: 0;
 }
-body.logged-in .cbi-section .tabs, body.logged-in .cbi-section .cbi-tabmenu:not(.mode):not(.map) { padding: var(--fs-space-1-5); }
-body.logged-in #tabmenu ul.tabs > li > a, body.logged-in ul.cbi-tabmenu.mode > li > a, body.logged-in .tabs > li > a, body.logged-in .cbi-tabmenu > li > a { padding: var(--fs-space-2) var(--fs-space-3-5); }
+body.logged-in .cbi-section .tabs, body.logged-in .cbi-section .cbi-tabmenu:not(.mode):not(.map) { padding: 0; }
+body.logged-in #tabmenu ul.tabs > li > a, body.logged-in ul.cbi-tabmenu.mode > li > a, body.logged-in .tabs > li > a, body.logged-in .cbi-tabmenu > li > a { padding: var(--fs-space-2-5) var(--fs-space-1) var(--fs-space-3); }
 body.logged-in .cbi-tab-descr { margin: calc(var(--fs-space-2) * -1) 0 var(--fs-space-4) 0; }
 body.logged-in .cbi-tab-disabled[data-errors]::after {
 	margin-inline-end: var(--fs-space-1);
@@ -1993,7 +2013,12 @@ body.logged-in .cbi-map > h2 + .cbi-map-descr, body.logged-in #view > h2 + .cbi-
 
 body.logged-in fieldset { margin-bottom: var(--fs-space-2); padding-top: var(--fs-space-2); }
 body.logged-in fieldset legend { padding-top: var(--fs-space-5); }
-body.logged-in .cbi-section { padding: var(--fs-card-pad); margin-bottom: var(--fs-card-gap); }
+body.logged-in .cbi-section { padding: var(--fs-card-pad); }
+/* overview grid items (menu-basalt.js's .fs-ovl, styles/pages/20-overview.css) carry no
+ * stock flow spacing — the grid's own gap is the rhythm; excluded here and mirrored below */
+body.logged-in .cbi-section:not(.fs-ovl > *) { margin-bottom: var(--fs-card-gap); }
+body.logged-in .fs-ovl { margin-bottom: var(--fs-card-gap); }
+body.logged-in .fs-ovl > .cbi-section { margin: 0; }
 body.logged-in .cbi-section > .cbi-title { margin-bottom: var(--fs-space-3); }
 /* zero override beats the generic fieldset/legend rules above, as the layered theme rule does */
 body.logged-in .cbi-section > .cbi-title h3, body.logged-in .cbi-section > h3:first-child, body.logged-in .cbi-section > legend { margin: 0; padding: 0; }
@@ -2025,7 +2050,7 @@ body.logged-in .cbi-section-error ul { margin: 0 0 0 var(--fs-space-5); }
 body.logged-in .cbi-section .table .td, body.logged-in .cbi-section .table .th {
 	padding: var(--fs-space-2-5) var(--fs-space-4) var(--fs-space-2-5) 0;
 }
-body.logged-in .cbi-section .table:is([id], .fs-dt) .td, body.logged-in .cbi-section .table:is([id], .fs-dt) .th, body.logged-in table.fs-dt .td, body.logged-in table.fs-dt .th { padding: var(--fs-space-2-5) var(--fs-space-3); }
+body.logged-in .cbi-section .table:is([id], .fs-dt) .td, body.logged-in .cbi-section .table:is([id], .fs-dt) .th, body.logged-in table.fs-dt .td, body.logged-in table.fs-dt .th { padding: var(--fs-space-3) calc(var(--fs-space-4) + var(--fs-space-0-5)); }
 body.logged-in .table.cbi-section-table .cbi-section-filter { padding: var(--fs-space-1) var(--fs-space-1-5); }
 body.logged-in .cbi-section-table .th, body.logged-in .cbi-section-table .td, body.logged-in .table.cbi-section-table .th, body.logged-in .table.cbi-section-table .td, body.logged-in .table.cbi-section-table .tr::before { padding: var(--fs-space-2) var(--fs-space-3) var(--fs-space-2) 0; }
 body.logged-in .table.cbi-section-table:not(.cbi-section *):not(.cbi-section-node *) .th, body.logged-in .table.cbi-section-table:not(.cbi-section *):not(.cbi-section-node *) .td { padding: var(--fs-space-2-5) var(--fs-space-3); }
@@ -2070,6 +2095,25 @@ body.logged-in .cbi-page-actions {
 	padding: var(--fs-space-2) 0;
 	margin: 0 0 var(--fs-card-gap);
 }
+/* the Fluent page head re-parents the stock bar (menu-basalt.js); the
+ * head owns the rhythm, the bar contributes none */
+body.logged-in .fs-pg-actions .cbi-page-actions {
+	padding: 0;
+	margin: 0;
+}
+/* the head itself and the sectioned cards' head strip are
+ * layout-bearing too: a hostile unlayered reset must not collapse them */
+body.logged-in .fs-pghead {
+	padding: 0;
+	margin: 0 0 var(--fs-space-5);
+}
+body.logged-in .fs-crumbs { padding: 0; margin: 0 0 6px; }
+body.logged-in .fs-pg-title { padding: 0; margin: 0; }
+body.logged-in .fs-card-head {
+	padding: var(--fs-space-3) var(--fs-card-pad);
+	margin: calc(var(--fs-card-pad) * -1) calc(var(--fs-card-pad) * -1) var(--fs-space-3);
+}
+body.logged-in .fs-card-more { margin: 0; margin-inline-start: auto; }
 body.logged-in .cbi-page-actions .cbi-button, body.logged-in .cbi-page-actions .btn { padding: 0 var(--fs-space-5); }
 body.logged-in .cbi-page-actions > :not([method="post"]):not(.cbi-button-apply):not(.cbi-button-negative):not(.cbi-button-save):not(.cbi-button-reset) {
 	margin-inline-end: var(--fs-space-1);
@@ -2093,6 +2137,13 @@ body.logged-in .cbi-input-text, body.logged-in .cbi-input-password, body.logged-
 }
 body.logged-in select, body.logged-in select.cbi-input-select, body.logged-in .cbi-value-field select {
 	padding: var(--fs-space-2) var(--fs-space-8) var(--fs-space-2) var(--fs-space-3);
+}
+/* focus mirror: the layered focus rule thickens the bottom edge to 2px INSIDE the same envelope
+ * ((8+1) -> (7+2)); this unlayered pinned padding would beat that compensation without its own
+ * mirror. Typed fields + select only — the broad `input:focus:not(...)` fallback stays unmirrored
+ * (LuCI ships no bare input; file/range are excluded from the fallback itself). */
+body.logged-in .cbi-input-text:focus, body.logged-in .cbi-input-password:focus, body.logged-in .cbi-input-textarea:focus, body.logged-in .cbi-section-create-name:focus, body.logged-in input[type="text"]:focus, body.logged-in input[type="password"]:focus, body.logged-in input[type="number"]:focus, body.logged-in input[type="email"]:focus, body.logged-in input[type="url"]:focus, body.logged-in input[type="search"]:focus, body.logged-in input[type="tel"]:focus, body.logged-in input[type="date"]:focus, body.logged-in input[type="time"]:focus, body.logged-in input[type="datetime-local"]:focus, body.logged-in input[type="month"]:focus, body.logged-in input[type="week"]:focus, body.logged-in input[type="color"]:focus, body.logged-in textarea:focus, body.logged-in select:focus, body.logged-in select.cbi-input-select:focus, body.logged-in .cbi-value-field select:focus {
+	padding-bottom: calc(var(--fs-space-2) - 1px);
 }
 
 body.logged-in .cbi-dropdown > ul { margin: 0; padding: 0; }
@@ -2402,17 +2453,21 @@ body[theme="dark"] #app .module-settings__item {
 		color: var(--fs-text); font-weight: var(--fs-weight-bold);
 	}
 
+	/* Fluent: a 36px gradient tile with a white glyph — no border, the tile carries itself */
 	.fs-logo {
-		width: var(--fs-btn-size); height: var(--fs-btn-size); border-radius: var(--fs-radius);
-		border: var(--fs-hairline); /* glyph is baked-colour (brand.ut), no currentColor use */
+		width: calc(36px * var(--fs-density-box)); height: calc(36px * var(--fs-density-box));
+		border-radius: var(--fs-radius-base);
+		background: linear-gradient(160deg, var(--fs-brand-a) 0%, var(--fs-brand-b) 58%, var(--fs-brand-c) 100%);
+		box-shadow: var(--fs-shadow-card);
+		border: 0;
 		display: flex; align-items: center; justify-content: center;
 		flex: 0 0 auto;
 	}
-	.fs-logo svg { width: 20px; height: 20px; }
-	.fs-logo-ring { fill: #002b49; } /* flips with mode like the favicon SVG; cyan arcs stay baked */
-	:root[data-darkmode="true"] .fs-logo-ring { fill: #e6f4fb; }
+	.fs-logo svg { width: 18px; height: 18px; }
+	.fs-logo-ring { fill: #ffffff; } /* white glyph on the gradient tile; cyan arcs stay baked */
+	:root[data-darkmode="true"] .fs-logo-ring { fill: #f3f2f1; }
 
-	.fs-wordmark { font-size: var(--fs-type-lg); font-weight: var(--fs-weight-bold); letter-spacing: -.01em; }
+	.fs-wordmark { font-size: var(--fs-type-lg); font-weight: var(--fs-weight); letter-spacing: -.01em; }
 
 	/* First tab stop — never display:none/visibility:hidden, that drops it from the tab order. */
 	.fs-skip {
@@ -2445,7 +2500,6 @@ body[theme="dark"] #app .module-settings__item {
 	#maincontent:focus { outline: none; }
 
 	.fs-logout { display: flex; align-items: center; color: var(--fs-dim); }
-	.fs-logout:hover { color: var(--fs-danger); }
 
 	.fs-indicators { display: flex; align-items: center; gap: var(--fs-space-2); }
 
@@ -2454,8 +2508,10 @@ body[theme="dark"] #app .module-settings__item {
 
 	/* fitTabStrips (fs-chrome.js) adds .fs-dense1/2 when the horizontal menu row would wrap, and
 	 * strips them in the vertical sidebar — no media guard needed. */
-	.fs-sidebar ul.nav.fs-dense1 > li > a { padding: var(--fs-space-1) var(--fs-space-2); }
-	.fs-sidebar ul.nav.fs-dense2 > li > a { padding: var(--fs-space-1) var(--fs-space-1-5); font-size: var(--fs-type); }
+	/* horizontal padding only: the Pivot item keeps its full-bar stretch, and shrinking the
+	 * height would detach the active underline from the bar's baseline */
+	.fs-sidebar ul.nav.fs-dense1 > li > a { padding: 0 var(--fs-space-2); }
+	.fs-sidebar ul.nav.fs-dense2 > li > a { padding: 0 var(--fs-space-1-5); font-size: var(--fs-type); }
 
 	/* One markup (`ul.nav > li > a`) for both layouts, so these three run once. */
 	ul.nav { position: relative; margin: 0; list-style: none; }
@@ -2467,16 +2523,30 @@ body[theme="dark"] #app .module-settings__item {
 	.dropdown-menu li { display: block; position: relative; }
 	ul.nav .dropdown-menu a, .dropdown-menu a { line-height: 18px; } /* denser than ul.nav a above */
 
+	/* Fluent: a 5% ink wash instead of a panel2 plate — the Pivot item keeps its ink at rest */
 	.fs-sidebar ul.nav > li > a:hover,
 	.fs-sidebar ul.nav ul a:hover,
-	.fs-themerow:hover {
-		background: var(--fs-panel2); color: var(--fs-text); opacity: 1;
+	.fs-logout:hover {
+		background: color-mix(in srgb, var(--fs-text) 5%, transparent);
+		color: var(--fs-text); opacity: 1;
 	}
-	.fs-sidebar ul.nav > li > a.active,
-	.fs-sidebar ul.nav ul a.active,
-	.fs-themerow[aria-expanded="true"],
-	.fs-modemenu li.active a {
-		background: var(--fs-accent-soft); color: var(--fs-accent);
+	/* the field keeps its own plate hover (20-shell.css): it has a border to shade */
+	/* restated after the wash group, or it would lose to it at equal specificity */
+	.fs-logout:hover { color: var(--fs-danger); }
+	/* Fluent Pivot active: accent ink + the 26px underline (position: relative on the bar item,
+	 * 20-shell.css); dropdown leaves, the open field and the mode strip stay plateless */
+	.fs-sidebar ul.nav ul a.active { background: transparent; color: var(--fs-accent); font-weight: var(--fs-weight); }
+	.fs-search-field[aria-expanded="true"],
+	.fs-modemenu li.active a { background: transparent; color: var(--fs-accent); }
+	.fs-sidebar ul.nav > li > a.active {
+		background: transparent; color: var(--fs-accent);
+		font-weight: var(--fs-weight);
+	}
+	.fs-sidebar ul.nav > li > a.active::after {
+		content: ""; position: absolute; inset-inline: 0; bottom: 0;
+		margin-inline: auto; width: 26px; height: 3px;
+		border-radius: 3px 3px 0 0;
+		background: var(--fs-accent);
 	}
 	/* Plate on the PAGE only; the open ANCESTOR keeps the ink alone — issue #37 (two identical
 	 * plates stacked on System -> System otherwise). chrome.md, "menu-footstrap.js". */
@@ -2485,7 +2555,7 @@ body[theme="dark"] #app .module-settings__item {
 	/* --fs-focus-ring-solo: none of these flips a border on focus, so the ring alone must clear
 	 * 3:1 — the tinted ring reads only 1.15-1.29:1 (two-ring contract, 02-tokens.css). */
 	.fs-railtoggle:focus-visible,
-	.fs-themerow:focus-visible,
+	.fs-search-field:focus-visible,
 	.fs-logout:focus-visible,
 	.fs-sidebar ul.nav a:focus-visible {
 		outline: none;
@@ -2509,10 +2579,23 @@ body[theme="dark"] #app .module-settings__item {
 	:root {
 		--fs-pattern-url: url("/luci-static/basalt/pattern/texture.svg");
 		--fs-pattern-size: 260px;
-		--fs-pattern-strength: .22;
+		/* Fluent light: the motif survives only as a whisper over the Mica wash */
+		--fs-pattern-strength: .05;
 	}
 
-	:root[data-layout="top"] { background-color: var(--fs-bg); }
+	/* Fluent Mica: two cool radial lights over the warm neutral ramp, plus the
+	 * faint blueprint dot grid the mock paints behind the cards. */
+	:root[data-layout="top"] {
+		background-color: var(--fs-bg);
+		background-image:
+			radial-gradient(circle, rgba(0, 90, 158, .05) 1px, transparent 1.5px),
+			radial-gradient(1100px 620px at 4% -6%, rgba(222, 236, 249, .9), transparent 70%),
+			radial-gradient(950px 560px at 99% 104%, rgba(199, 224, 244, .55), transparent 70%),
+			linear-gradient(180deg, #f6f7f8 0%, var(--fs-bg) 46%, #eff1f4 100%);
+		background-size: 22px 22px, auto, auto, auto;
+		background-repeat: repeat, no-repeat, no-repeat, no-repeat;
+		background-attachment: fixed;
+	}
 	:root[data-layout="top"] body,
 	:root[data-layout="top"] .fs-main { background-color: transparent; }
 	:root[data-layout="top"] footer.fs-footer { background: transparent; }
@@ -2604,6 +2687,8 @@ body[theme="dark"] #app .module-settings__item {
 		flex-direction: row; flex-wrap: wrap; align-items: center;
 		gap: var(--fs-space-2-5); padding: var(--fs-space-2-5) var(--fs-space-4);
 		background: var(--fs-bar-bg);
+		-webkit-backdrop-filter: blur(24px) saturate(125%);
+		backdrop-filter: blur(24px) saturate(125%);
 		border-inline-end: 0; border-bottom: var(--fs-hairline);
 		/* the submenu popups anchor to this bar and must escape it */
 		overflow: visible;
@@ -2620,16 +2705,19 @@ body[theme="dark"] #app .module-settings__item {
 	 * (fs-chrome.js fitChrome adds .fs-bar-stack when it does NOT fit). */
 	.fs-sidebar ul.nav {
 		order: 3; flex: 1 1 100%;
-		flex-direction: row; flex-wrap: wrap; align-items: center; gap: var(--fs-space-0-5);
+		flex-direction: row; flex-wrap: wrap; align-items: stretch; gap: var(--fs-space-1);
 	}
 	/* anchors the dropdown to its OWN item, not the bar — issue #19, chrome.md, "A bar dropdown
 	 * anchors to its own <li>". A phone never shows it: `hover: none` disables the rule. */
 	.fs-sidebar ul.nav > li.has-sub { position: relative; }
+	/* Fluent Pivot: items stretch the bar's full height, ink at rest, the 26px underline
+	 * (10-chrome.css ::after) carries the active state */
 	.fs-sidebar ul.nav > li > a {
 		display: flex; align-items: center;
-		padding: var(--fs-space-1-5) var(--fs-space-3); border-radius: var(--fs-radius);
-		color: var(--fs-dim);
-		font-size: var(--fs-type); font-weight: var(--fs-weight); white-space: nowrap;
+		position: relative;
+		padding: 0 var(--fs-space-4); border-radius: var(--fs-radius) var(--fs-radius) 0 0;
+		color: var(--fs-text);
+		font-size: var(--fs-type); font-weight: var(--fs-weight-normal); white-space: nowrap;
 	}
 	/* a bar item is its label: no icon, no chevron */
 	.fs-sidebar ul.nav > li > a .fs-ico,
@@ -2643,7 +2731,9 @@ body[theme="dark"] #app .module-settings__item {
 		position: absolute; inset-inline: 0 auto; top: calc(100% + 8px); z-index: var(--fs-z-flyout);
 		width: max-content; min-width: 200px; max-width: calc(100vw - 32px);
 		margin: 0; padding: var(--fs-space-2);
-		background: var(--fs-panel);
+		background: color-mix(in srgb, var(--fs-panel) 88%, transparent);
+		-webkit-backdrop-filter: blur(30px) saturate(125%);
+		backdrop-filter: blur(30px) saturate(125%);
 		border: var(--fs-hairline);
 		border-radius: var(--fs-radius-lg); box-shadow: var(--fs-shadow-pop);
 	}
@@ -2666,7 +2756,7 @@ body[theme="dark"] #app .module-settings__item {
 		color: var(--fs-dim); font-size: var(--fs-type); font-weight: var(--fs-weight);
 	}
 
-	/* right cluster: the poll pill, then Appearance and Log out as square icon buttons.
+	/* right cluster: the poll pill, then the Search field, a divider and the user chip.
 	 * LuCI's #indicators (poll "Refreshing", unsaved changes) collapses when empty, so it
 	 * only shows when there is something to report. */
 	.fs-sidebar #indicators {
@@ -2674,18 +2764,75 @@ body[theme="dark"] #app .module-settings__item {
 		order: 2; margin-inline-start: auto; padding: 0;
 	}
 
-	.fs-themerow {
-		display: flex; align-items: center; justify-content: center;
-		flex: 0 0 auto; order: 2; margin-inline-start: auto;
+	/* Search: a trigger FIELD anchoring a flyout panel (menu-basalt.js fills it). The
+	 * container carries position:relative for the panel and the far-edge auto margin;
+	 * the field itself is a plain flat control — Fluent mock: 248px wide, no shadow. */
+	.fs-search {
+		position: relative; display: flex; flex: 0 0 auto;
+		order: 2; margin-inline-start: auto;
 		/* see the :not(:empty) rule below — two auto margins would SPLIT the free space between
 		 * them instead of pushing one cluster to the bar's far edge */
-		width: var(--fs-btn-size); height: var(--fs-btn-size); padding: 0;
+	}
+	.fs-search-field {
+		display: flex; align-items: center; gap: var(--fs-space-2);
+		width: 248px; height: var(--fs-ctl-h); padding: 0 var(--fs-space-2-5);
 		border: var(--fs-hairline); border-radius: var(--fs-radius);
-		background: transparent; color: var(--fs-dim);
-		font: inherit; font-weight: var(--fs-weight); font-size: var(--fs-type); line-height: 1.1;
+		background: color-mix(in srgb, var(--fs-panel) 90%, transparent);
+		color: var(--fs-dim); font: inherit; font-size: var(--fs-type); line-height: 1.1;
 		text-align: start; cursor: pointer;
 		transition: background var(--fs-dur), border-color var(--fs-dur), color var(--fs-dur);
 	}
+	.fs-search-field .fs-ico { width: 16px; height: 16px; flex: 0 0 auto; }
+	.fs-search-field .fs-ph {
+		flex: 1 1 auto; min-width: 0; overflow: hidden;
+		white-space: nowrap; text-overflow: ellipsis;
+	}
+	.fs-search-field kbd {
+		flex: 0 0 auto; padding: 1px var(--fs-space-1-5);
+		border: var(--fs-hairline); border-radius: var(--fs-radius-sm);
+		background: color-mix(in srgb, var(--fs-text) 4%, transparent);
+		color: var(--fs-dim);
+		font: inherit; font-size: var(--fs-type-xs); line-height: 1.4;
+	}
+	/* a hairline control: the ring lands on the border, not a box-shadow — 10-chrome.css */
+	.fs-search-field:hover { background: var(--fs-panel); color: var(--fs-text); }
+	/* search results panel — the nav dropdown look (same acrylic, hairline, shadow) */
+	.fs-search-panel {
+		position: absolute; inset-inline: auto 0; top: calc(100% + 8px); z-index: var(--fs-z-flyout);
+		width: 320px; max-width: calc(100vw - 32px);
+		margin: 0; padding: var(--fs-space-2);
+		display: none; flex-direction: column; gap: var(--fs-space-0-5);
+		background: color-mix(in srgb, var(--fs-panel) 88%, transparent);
+		-webkit-backdrop-filter: blur(30px) saturate(125%);
+		backdrop-filter: blur(30px) saturate(125%);
+		border: var(--fs-hairline);
+		border-radius: var(--fs-radius-lg); box-shadow: var(--fs-shadow-pop);
+	}
+	.fs-search.open .fs-search-panel { display: flex; animation: fs-fade var(--fs-dur); }
+	.fs-search-panel .fs-search-input {
+		width: 100%; height: var(--fs-ctl-h); padding: 0 var(--fs-space-2-5);
+		border: var(--fs-hairline); border-radius: var(--fs-radius);
+		background: color-mix(in srgb, var(--fs-text) 4%, transparent);
+		color: var(--fs-text); font: inherit; font-size: var(--fs-type);
+	}
+	.fs-search-panel .fs-search-input::placeholder { color: var(--fs-dim); }
+	.fs-search-panel .fs-search-input:focus-visible {
+		outline: none; border-color: var(--fs-accent);
+		box-shadow: var(--fs-focus-ring);
+	}
+	.fs-search-list { display: flex; flex-direction: column; gap: var(--fs-space-0-5); max-height: 320px; overflow-y: auto; margin: 0; padding: 0; list-style: none; }
+	.fs-search-item {
+		display: block; padding: var(--fs-space-2) var(--fs-space-3);
+		border-radius: var(--fs-radius-sm); text-decoration: none;
+	}
+	.fs-search-item .t { display: block; color: var(--fs-text); font-size: var(--fs-type); font-weight: var(--fs-weight-bold); line-height: 1.3; }
+	.fs-search-item .p { display: block; color: var(--fs-dim); font-size: var(--fs-type-xs); line-height: 1.3; margin-top: 1px; }
+	@media (hover: hover) {
+		.fs-search-item:hover { background: color-mix(in srgb, var(--fs-text) 5%, transparent); }
+	}
+	.fs-search-empty { padding: var(--fs-space-3); color: var(--fs-dim); font-size: var(--fs-type); text-align: center; }
+	/* divider between the search field and the user chip */
+	.fs-vr { flex: 0 0 auto; order: 3; width: 1px; height: 22px; margin: 0; border: 0; background: var(--fs-border); }
 	/* .fs-ind-compact then .fs-bar-actrow, both by fitCluster (fs-chrome.js) — chrome.md, "Right
 	 * cluster: two fit steps". max-width releases with the flex basis, or the 30ch cap leaves
 	 * the brand short of the row it was just given. */
@@ -2723,27 +2870,33 @@ body[theme="dark"] #app .module-settings__item {
 
 	/* Exactly ONE member of the far-edge cluster may carry an auto inline-start margin, and it must be the
 	 * FIRST one actually rendered. #indicators is earlier in the DOM, so when the poll pill
-	 * shows IT opens the gap and .fs-themerow's auto must stand down — otherwise flexbox
-	 * SPLITS the free space between the two and the pill drifts away from the buttons.
-	 * .fs-themerow keeps its own auto for when the pill is empty and collapsed. */
-	.fs-sidebar #indicators:not(:empty) ~ .fs-themerow { margin-inline-start: 0; }
-	/* …and there are TWO .fs-themerow buttons now (Search, then Appearance), so the same split
-	 * would happen between THEM whenever the pill is collapsed: the second one stands down too. */
-	.fs-themerow ~ .fs-themerow { margin-inline-start: 0; }
+	 * shows IT opens the gap and .fs-search's auto must stand down — otherwise flexbox
+	 * SPLITS the free space between the two and the pill drifts away from the field.
+	 * .fs-search keeps its own auto for when the pill is empty and collapsed. */
+	.fs-sidebar #indicators:not(:empty) ~ .fs-search { margin-inline-start: 0; }
 	.fs-logout {
-		flex: 0 0 auto; order: 2; justify-content: center;
-		width: var(--fs-btn-size); height: var(--fs-btn-size); padding: 0;
-		border: var(--fs-hairline); border-radius: var(--fs-radius);
-		background: transparent;
+		flex: 0 0 auto; order: 3; justify-content: center;
+		display: flex; align-items: center; gap: var(--fs-space-2);
+		height: var(--fs-ctl-h); padding: 0 var(--fs-space-2-5) 0 var(--fs-space-1);
+		border: 0; border-radius: var(--fs-radius-pill);
+		background: transparent; color: var(--fs-text);
 	}
-	/* on a square button the BORDER carries the state — the fill and the ink come from the
-	 * shared hover/active groups in 10-chrome.css */
-	.fs-themerow:hover,
-	.fs-themerow[aria-expanded="true"] { border-color: var(--fs-accent); }
-	.fs-logout:hover { border-color: var(--fs-danger); }
-	.fs-themerow .fs-label, .fs-logout .fs-label { display: none; }
-	.fs-themerow .fs-ico,
-	.fs-logout .fs-ico { width: 18px; height: 18px; flex: 0 0 auto; }
+	/* the user chip: initial-avatar circle + name/role stack + the log-out icon */
+	.fs-avatar {
+		display: inline-flex; align-items: center; justify-content: center;
+		flex: 0 0 auto; width: 26px; height: 26px; border-radius: 999px;
+		background: color-mix(in srgb, var(--fs-accent) 12%, transparent);
+		color: var(--fs-accent); font-size: var(--fs-type-xs); font-weight: var(--fs-weight-bold);
+		text-transform: uppercase; line-height: 1;
+	}
+	.fs-who { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; line-height: 1.2; }
+	.fs-who .fs-name { max-width: 14ch; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: var(--fs-type); font-weight: var(--fs-weight-bold); }
+	.fs-who .fs-role { font-size: var(--fs-type-xs); color: var(--fs-dim); }
+	/* borderless controls: no border to flip, so the open state carries in the ink —
+	 * hover colours stay with the shared groups in 10-chrome.css */
+	.fs-search-field[aria-expanded="true"] { border-color: var(--fs-accent); color: var(--fs-text); }
+	.fs-logout .fs-label { display: none; }
+	.fs-logout .fs-ico { width: 18px; height: 18px; flex: 0 0 auto; color: var(--fs-dim); }
 	.fs-sidebar ul.nav .fs-ico { flex: 0 0 auto; }
 
 	/* The vertical sidebar: the single override, guarded POSITIVELY (never `:not([data-layout=
@@ -2815,7 +2968,7 @@ body[theme="dark"] #app .module-settings__item {
 		:root[data-layout="sidebar"]:not([data-narrow]) .fs-sidebar ul.nav > li > a .fs-ico { display: block; }
 		:root[data-layout="sidebar"]:not([data-narrow]) .fs-sidebar ul.nav > li > a .fs-chevron { display: block; }
 		:root[data-layout="sidebar"]:not([data-narrow]) .fs-sidebar ul.nav .fs-ico,
-		:root[data-layout="sidebar"]:not([data-narrow]) .fs-themerow .fs-ico,
+		:root[data-layout="sidebar"]:not([data-narrow]) .fs-search-field .fs-ico,
 		:root[data-layout="sidebar"]:not([data-narrow]) .fs-logout .fs-ico { width: 17px; height: 17px; }
 
 		/* nested submenu -> an inline accordion, not a popup */
@@ -2847,25 +3000,29 @@ body[theme="dark"] #app .module-settings__item {
 		:root[data-layout="sidebar"]:not([data-narrow]) .fs-sidebar ul.nav > li.has-sub.open > ul { display: flex; }
 		:root[data-layout="sidebar"]:not([data-narrow]) .fs-sidebar ul.nav ul a { padding: var(--fs-space-2) var(--fs-space-3); }
 
-		/* the Appearance trigger and Log out are full-width text rows down here */
-		:root[data-layout="sidebar"]:not([data-narrow]) .fs-themerow,
+		/* the Search field and Log out are full-width rows down here */
+		:root[data-layout="sidebar"]:not([data-narrow]) .fs-search,
 		:root[data-layout="sidebar"]:not([data-narrow]) .fs-logout {
 			order: 0; margin-inline-start: 0;
 			width: 100%; height: auto;
 			justify-content: normal;
-			gap: var(--fs-space-3); padding: var(--fs-space-2-5) var(--fs-space-3);
-			border: 0; border-radius: var(--fs-radius);
-			background: transparent;
+			gap: var(--fs-space-3);
 		}
-		:root[data-layout="sidebar"]:not([data-narrow]) .fs-themerow { text-align: start; }
-		:root[data-layout="sidebar"]:not([data-narrow]) .fs-logout { font-weight: var(--fs-weight); font-size: var(--fs-type); }
+		:root[data-layout="sidebar"]:not([data-narrow]) .fs-search-field {
+			width: 100%; padding: 0 var(--fs-space-2-5);
+			justify-content: normal; text-align: start;
+		}
+		:root[data-layout="sidebar"]:not([data-narrow]) .fs-search-field .fs-ph { flex: 1 1 auto; }
+		:root[data-layout="sidebar"]:not([data-narrow]) .fs-vr { display: none; }
+		:root[data-layout="sidebar"]:not([data-narrow]) .fs-logout {
+			padding: 0 var(--fs-space-2-5); border-radius: var(--fs-radius);
+			font-weight: var(--fs-weight); font-size: var(--fs-type);
+		}
+		:root[data-layout="sidebar"]:not([data-narrow]) .fs-logout .fs-who { display: none; }
 		:root[data-layout="sidebar"]:not([data-narrow]) .fs-logout:hover { background: var(--fs-panel2); border-color: transparent; }
-		:root[data-layout="sidebar"]:not([data-narrow]) .fs-themerow:hover,
-		:root[data-layout="sidebar"]:not([data-narrow]) .fs-themerow[aria-expanded="true"] { border-color: transparent; }
-		:root[data-layout="sidebar"]:not([data-narrow]) .fs-themerow .fs-label,
 		:root[data-layout="sidebar"]:not([data-narrow]) .fs-logout .fs-label { display: block; flex: 1 1 auto; }
 
-		/* the poll pill sits in the sidebar footer, above Appearance */
+		/* the poll pill sits in the sidebar footer, above Search and Log out */
 		:root[data-layout="sidebar"]:not([data-narrow]) .fs-sidebar #indicators {
 			order: 0; margin-inline-start: 0;
 			flex-wrap: wrap; gap: var(--fs-space-1-5);
@@ -2882,8 +3039,8 @@ body[theme="dark"] #app .module-settings__item {
 	}
 
 
-	/* The Appearance controls used to live here (a popover on <body>). They are a PAGE now
-	 * (System -> Appearance): styles/pages/80-appearance.css. */
+	/* The bar carries no flyout of its own — Search anchors its panel to .fs-search
+	 * (position:relative above), so nothing extra is needed here. */
 
 	/* Collapsed sidebar (icon rail): <html data-rail="true">, persisted in localStorage and
 	 * re-applied before paint by head.ut. Labels collapse and a section's submenu becomes a
@@ -2908,18 +3065,28 @@ body[theme="dark"] #app .module-settings__item {
 		:root[data-layout="sidebar"]:not([data-narrow])[data-rail="true"] .fs-navlabel,
 		:root[data-layout="sidebar"]:not([data-narrow])[data-rail="true"] .fs-modemenu,
 		:root[data-layout="sidebar"]:not([data-narrow])[data-rail="true"] .fs-sidebar ul.nav > li > a > .fs-label,
-		:root[data-layout="sidebar"]:not([data-narrow])[data-rail="true"] .fs-themerow > .fs-label,
+		:root[data-layout="sidebar"]:not([data-narrow])[data-rail="true"] .fs-search-field > .fs-ph,
+		:root[data-layout="sidebar"]:not([data-narrow])[data-rail="true"] .fs-search-field kbd,
 		:root[data-layout="sidebar"]:not([data-narrow])[data-rail="true"] .fs-logout > .fs-label,
+		:root[data-layout="sidebar"]:not([data-narrow])[data-rail="true"] .fs-vr,
 		/* a rail item has no accordion — its children fly out sideways — so the chevron says
 		 * nothing and crowds the icon. Selector kept this long because the vertical override
 		 * turns the chevron back on at (0,6,3), so a plainer form here would only be (0,6,0). */
 		:root[data-layout="sidebar"]:not([data-narrow])[data-rail="true"] .fs-sidebar ul.nav > li > a .fs-chevron { display: none; }
 
 		:root[data-layout="sidebar"]:not([data-narrow])[data-rail="true"] .fs-sidebar ul.nav > li > a,
-		:root[data-layout="sidebar"]:not([data-narrow])[data-rail="true"] .fs-themerow,
+		:root[data-layout="sidebar"]:not([data-narrow])[data-rail="true"] .fs-search,
 		:root[data-layout="sidebar"]:not([data-narrow])[data-rail="true"] .fs-logout {
 			justify-content: center; gap: 0; padding: var(--fs-space-2-5) 0;
 		}
+		/* rail: the field collapses to a square icon trigger, the chip to the avatar alone */
+		:root[data-layout="sidebar"]:not([data-narrow])[data-rail="true"] .fs-search-field {
+			width: var(--fs-ctl-h); padding: 0; justify-content: center;
+		}
+		:root[data-layout="sidebar"]:not([data-narrow])[data-rail="true"] .fs-logout {
+			width: var(--fs-ctl-h); height: var(--fs-ctl-h); padding: 0;
+		}
+		:root[data-layout="sidebar"]:not([data-narrow])[data-rail="true"] .fs-logout .fs-who { display: none; }
 
 		/* leaf sections have no flyout — show their name as a tooltip bubble */
 		:root[data-layout="sidebar"]:not([data-narrow])[data-rail="true"] .fs-sidebar ul.nav > li:not(.has-sub) > a::after {
@@ -3016,7 +3183,8 @@ body[theme="dark"] #app .module-settings__item {
 	}
 	.fs-sidebar #indicators:empty { display: none; }
 	.fs-indicators { flex-wrap: wrap; }
-	.fs-content { padding: var(--fs-space-5) var(--fs-content-pad); flex: 1 1 auto; width: 100%; max-width: var(--fs-content-max); margin: 0 auto; }
+	/* Fluent mock: 30px top / 64px gutters / 40px bottom, full-bleed to --fs-content-max: none */
+	.fs-content { padding: calc(var(--fs-space-7) + var(--fs-space-0-5)) var(--fs-content-pad) var(--fs-space-10); flex: 1 1 auto; width: 100%; max-width: var(--fs-content-max); margin: 0 auto; }
 
 	/* fs-router.js builds the incoming page in a second #view here, then moves its children into
 	 * the live one, so the visible page is never emptied while the next one loads. `visibility:
@@ -3074,7 +3242,6 @@ body[theme="dark"] #app .module-settings__item {
 	.fs-main > .alert-message {
 		order: 1; margin: var(--fs-space-4) auto 0;
 		width: calc(100% - var(--fs-content-pad) * 2);
-		max-width: calc(var(--fs-content-max) - var(--fs-content-pad) * 2);
 	}
 	.fs-main > .fs-content { order: 2; }
 	.fs-main > .fs-footer { order: 3; }
@@ -3111,7 +3278,7 @@ body[theme="dark"] #app .module-settings__item {
 		/* the bar's control surface — ui.js emits a bare `<span data-indicator=…>` with NO
 		 * class, so a `.label`-keyed rule matches nothing */
 		background: transparent;
-		border: var(--fs-hairline);
+		border: 0;
 		color: var(--fs-dim);
 		border-radius: var(--fs-radius); padding: 0 var(--fs-space-3); box-shadow: none;
 	}
@@ -3138,7 +3305,7 @@ body[theme="dark"] #app .module-settings__item {
 	 * margin-block-start: 0. */
 	.cbi-progressbar {
 		position: relative;
-		height: 10px;
+		height: 6px;
 		background: var(--fs-track);
 		border: 0;
 		border-radius: var(--fs-radius-pill);
@@ -3222,6 +3389,7 @@ body[theme="dark"] #app .module-settings__item {
 		background: var(--fs-panel);
 		border: var(--fs-hairline);
 		border-radius: var(--fs-radius-lg);
+		box-shadow: var(--fs-shadow-card);
 	}
 	.cbi-section { padding: var(--fs-card-pad); margin-bottom: var(--fs-card-gap); }
 	/* bare <legend> only; ink from the heading ramp. No line-height — base already sets 1. */
@@ -3293,9 +3461,11 @@ body[theme="dark"] #app .module-settings__item {
 
 	/* --- DATA tables ([id] or JS-tagged .fs-dt) --- `:is()` at ONE specificity: split, a table
 	 * known only by the tag (Status -> Routing) lost to key/value's default. */
+	/* Fluent mock: 12px block / 18px inline for BOTH header and data cells (th 11px rounded to the
+	 * shared padding, within a 1.5px tolerance) */
 	.cbi-section .table:is([id], .fs-dt) .td,
 	.cbi-section .table:is([id], .fs-dt) .th,
-	table.fs-dt .td, table.fs-dt .th { padding: var(--fs-space-2-5) var(--fs-space-3); }
+	table.fs-dt .td, table.fs-dt .th { padding: var(--fs-space-3) calc(var(--fs-space-4) + var(--fs-space-0-5)); }
 	.cbi-section .table:is([id], .fs-dt) .td { font-family: var(--fs-font-mono); font-size: var(--fs-type); color: var(--fs-text); }
 
 	/* the min-content FLOOR belongs here: break-word (unlike base's -anywhere) does not lower
@@ -3332,7 +3502,8 @@ body[theme="dark"] #app .module-settings__item {
 	 * (18 jumps/1500 frames measured) — anchoring.md, "What the engine is told". */
 	.table.fs-dt { overflow-anchor: none; }
 
-	.cbi-section .table:is([id], .fs-dt) .tr:not(.table-titles):not(.placeholder):hover .td { background: var(--fs-panel2); }
+	/* Fluent mock row hover: a 6% accent wash, not a grey step */
+	.cbi-section .table:is([id], .fs-dt) .tr:not(.table-titles):not(.placeholder):hover .td { background: var(--fs-row-hover); }
 	.cbi-section .table:is([id], .fs-dt) .tr.table-titles .th { border-bottom-color: var(--fs-border); }
 	/* contour (border-collapse:separate, or the radius is silently dropped); #view too —
 	 * Startup renders .table.fs-dt with no section */
@@ -3377,6 +3548,13 @@ body[theme="dark"] #app .module-settings__item {
 	}
 	.cbi-section .table:not([id]):not(.cbi-section-table):not(.fs-dt):not(:has(.th)):not(:has(.td:nth-child(3))):not([style*="table-layout"]) .td:last-child:not(:first-child) {
 		font-family: var(--fs-font-mono); color: var(--fs-text); text-align: end;
+	}
+	/* re-pin the key/value row edge to the hairline: the row-line rule below out-specifies the
+	 * generic `.cbi-section .table .td` default and would silently lighten it. :not(:last-child)
+	 * keeps the flush last row — this rule out-specifies that reset too, so excluding here is the
+	 * only way both can hold. */
+	.cbi-section .table:not([id]):not(.cbi-section-table):not(.fs-dt):not(:has(.th)):not(:has(.td:nth-child(3))):not([style*="table-layout"]) .tr:not(:last-child) > .td {
+		border-bottom: var(--fs-hairline);
 	}
 	/* below ~560px the 40%/nowrap column starves the value — stacked below (560, not the config
 	 * table's 960px). :first-child:first-child doubles the pseudo-class ON PURPOSE, to outrank. */
@@ -3471,19 +3649,23 @@ body[theme="dark"] #app .module-settings__item {
 	.table .tr.table-titles > .th,
 	.table .tr.cbi-section-table-titles > .th,
 	.table .tr.cbi-section-table-titles::before { border-bottom: var(--fs-hairline); }
-	.table .tr:not(.table-titles):not(.cbi-section-table-titles):not(:last-child) > .td,
+	/* Fluent mock: data separators are the faint row line, one step lighter than the frame's
+	 * hairline; the row-name ::before keeps the hairline (it doubles as an edge on 24.10) */
+	.table .tr:not(.table-titles):not(.cbi-section-table-titles):not(:last-child) > .td { border-bottom: 1px solid var(--fs-row-line); }
 	.table .tr.cbi-section-table-row:not(:last-child)::before { border-bottom: var(--fs-hairline); }
 	/* per-CELL border, so a foreign `position: relative; top:` (dashboard) drags one cell's
 	 * border out of line — `top` AND `bottom` cancels either without touching `relative` itself */
 	:is(#view, #modal_overlay) .fs-dt .td { top: auto; bottom: auto; }
-	/* descendant combinator so a real <table>'s inserted <tbody> is covered too */
+	/* descendant combinator so a real <table>'s inserted <tbody> is covered too. Fluent mock:
+	 * the header band is a faint panel step, not transparent */
 	.table .tr.table-titles, .table .tr.cbi-section-table-titles {
-		background: transparent;	/* drop the base panel2 header bar — match the dashboard's faint-label + underline look */
+		background: var(--fs-panel2);
 	}
 	.table .tr.table-titles .th, .table .tr.cbi-section-table-titles .th,
 	.table .tr.cbi-section-table-titles::before {
-		color: var(--fs-eyebrow-color); font-size: var(--fs-type-xs); font-weight: var(--fs-eyebrow-weight);
-		letter-spacing: var(--fs-eyebrow-tracking);
+		/* Fluent mock th: normal-case 12px/600 label in the secondary ink, no tracking, no face of its own — the row above paints the band */
+		color: var(--fs-dim); font-size: var(--fs-type-xs); font-weight: var(--fs-eyebrow-weight);
+		letter-spacing: 0;
 		background: transparent;
 	}
 	/* row NAME reads the same on both releases (real cell / ::before) — a LABEL, sans face */
@@ -3496,7 +3678,8 @@ body[theme="dark"] #app .module-settings__item {
 	}
 	/* row hover ONLY on real data/config tables (an untagged plain .table lit its whole block,
 	 * issue #5.3; a placeholder row lit up too, issue #5.2/#15) */
-	.table.cbi-section-table .tr.cbi-section-table-row:not(.placeholder):hover { background: var(--fs-panel2); }
+	/* Fluent mock row hover: a 6% accent wash, not a grey step */
+	.table.cbi-section-table .tr.cbi-section-table-row:not(.placeholder):hover { background: var(--fs-row-hover); }
 	/* keep section/modal tables flush (no forced hover-card look) */
 	.cbi-section .table > .tr, .cbi-modal .table > .tr { border-radius: 0; }
 
@@ -3645,63 +3828,50 @@ body[theme="dark"] #app .module-settings__item {
 		outline: 2px solid var(--fs-accent);
 		outline-offset: 2px;
 	}
-	/* Basalt v2: page cards are translucent so the built-in body
-	 * texture reads through them. Only the big content surfaces are
-	 * affected — nav dropdowns, modal dialogs, the tab strip, alerts,
-	 * inputs and DATA TABLES keep their opaque surface for legibility.
-	 *
-	 * 88% panel: the 76% fill let the high-contrast motif through hard
-	 * enough to blur card edges and fight dense table text in audits; 88%
-	 * still reads as glass over the texture while holding a clean edge and
-	 * full text contrast. Bare .table stays opaque — a standalone table is
-	 * a reading surface, not a card, and dense grids (leases, stations)
-	 * must not float over the motif. Engines without color-mix() get the
-	 * plain opaque panel (the @supports block simply drops). */
-	@supports (background: color-mix(in srgb, red 50%, transparent)) {
-		.cbi-section,
-		.cbi-map > .cbi-section-node,
-		fieldset.cbi-section,
-		.panel {
-			background-color: color-mix(in srgb, var(--fs-panel) 88%, transparent);
-		}
-		/* a nested data table must not stack two translucent fills;
-		 * 30-tables strips its frame on the same shape, keep the paint paired */
-		.cbi-section .table:is([id], .fs-dt) { background: none; }
-	}
-	/* alert panel: a left accent stripe on a panel card; variants recolour the frame */
-	.alert-message {
-		padding: var(--fs-space-3-5) var(--fs-space-4);
-		border-radius: var(--fs-radius-lg);
-		border: var(--fs-hairline);
-		/* logical: the stripe marks the READING start, swapping sides in RTL (LuCI ships ar/fa/he) */
-		border-inline-start: 3px solid var(--fs-accent);
-		/* --fs-panel stays the background-COLOUR; the tint is a background-IMAGE layer over it,
-		 * not a replacement — a `-fill` background alone is transparent to the wallpaper. */
+	/* Basalt v2.1 (Fluent): page cards are OPAQUE white. The mock keeps the
+	 * acrylic glass in the bar, popovers and the login card — reading
+	 * surfaces (cards, tables, forms) stay solid for contrast and clean
+	 * edges. This slice now only pins the panel paint and keeps the nested
+	 * table strip paired with it. */
+	.cbi-section,
+	.cbi-map > .cbi-section-node,
+	fieldset.cbi-section,
+	.panel {
 		background-color: var(--fs-panel);
-		background-image: linear-gradient(var(--fs-alert-tint, transparent), var(--fs-alert-tint, transparent));
+	}
+	/* a nested data table must not stack a second fill over the card's;
+	 * 30-tables strips its frame on the same shape, keep the paint paired */
+	.cbi-section .table:is([id], .fs-dt) { background: none; }
+	/* Fluent alert: a status tint with a matching 1px edge — no left stripe, no card frame.
+	 * Untyped alerts read informational (the previous stripe default), variants recolour both. */
+	.alert-message {
+		padding: var(--fs-space-3) var(--fs-space-4);
+		border-radius: var(--fs-radius);
+		border: 1px solid color-mix(in srgb, var(--fs-accent) 28%, transparent);
+		background-color: var(--fs-accent-bg);
 		color: var(--fs-text);
 		gap: var(--fs-space-3);
 	}
-	/* status lives in stripe+surface, ring stays neutral. :not(.btn) is load-bearing: a confirm
-	 * control is a `<label class="btn alert-message danger">`, and without the guard the tint
+	/* status lives in tint+edge. :not(.btn) is load-bearing: a confirm control is a
+	 * `<label class="btn alert-message danger">`, and without the guard the tint
 	 * out-ranked `.btn.danger`, fading its fill. */
 	.alert-message.warning:not(.btn) {
-		border-color: var(--fs-border); border-inline-start-color: var(--fs-warn);
-		--fs-alert-tint: var(--fs-warn-fill);
+		border-color: color-mix(in srgb, var(--fs-warn) 28%, transparent);
+		background-color: var(--fs-warn-bg);
 	}
 	.alert-message.error:not(.btn), .alert-message.danger:not(.btn) {
-		border-color: var(--fs-border); border-inline-start-color: var(--fs-danger);
-		--fs-alert-tint: var(--fs-danger-fill);
+		border-color: color-mix(in srgb, var(--fs-danger) 30%, transparent);
+		background-color: var(--fs-danger-bg);
 	}
 	.alert-message.success:not(.btn) {
-		border-inline-start-color: var(--fs-good);
-		--fs-alert-tint: var(--fs-good-fill);
+		border-color: color-mix(in srgb, var(--fs-good) 25%, transparent);
+		background-color: var(--fs-good-bg);
 	}
 	/* .notice groups HERE, not with .label.notice's accent: ui.js emits `notice spinning` for an
 	 * IN-PROGRESS banner, so it reads as informational rather than success. */
 	.alert-message.info:not(.btn), .alert-message.notice:not(.btn) {
-		border-inline-start-color: var(--fs-accent);
-		--fs-alert-tint: var(--fs-accent-fill);
+		border-color: color-mix(in srgb, var(--fs-accent) 28%, transparent);
+		background-color: var(--fs-accent-bg);
 	}
 
 	/* spinner ::before is inline-block for its usual inline hosts, but displayStatus() builds a
@@ -3796,36 +3966,67 @@ body[theme="dark"] #app .module-settings__item {
 	/* opaque surface (--fs-panel2 inherited): accent text on --fs-accent-soft measured 4.21:1
 	 * (theme/65-dropdown.css) — the border carries the accent instead */
 	.cbi-title .label.notice { opacity: 1; color: var(--fs-accent); border-color: var(--fs-accent); }
+
+	/* the uci-changes banner (header.ut): icon / body / dismiss. Its outer
+	 * rhythm comes from the guard's .alert-message margin (unlayered wins) */
+	.fs-uci-alert {
+		display: flex;
+		align-items: flex-start;
+	}
+	.fs-uci-alert .fs-a-ico {
+		display: inline-flex;
+		flex: 0 0 auto;
+		margin-top: 2px;
+		color: var(--fs-accent);
+	}
+	.fs-uci-alert .fs-a-ico .fs-ico { width: 18px; height: 18px; }
+	.fs-uci-alert .fs-a-body { flex: 1 1 auto; min-width: 0; }
+	/* the section rule's space-1 bottom gap reads right against the tint; drop only its top */
+	.fs-uci-alert h4 { margin-top: 0; }
+
+	/* the banner's × — ghost chip, subtle hover */
+	.fs-alert-close {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		flex: 0 0 auto;
+		width: 28px;
+		height: 28px;
+		padding: 0;
+		margin: -4px -6px 0 0;
+		border: 0;
+		border-radius: var(--fs-radius-sm);
+		background: transparent;
+		color: var(--fs-dim);
+		cursor: pointer;
+		transition: background-color var(--fs-dur), color var(--fs-dur);
+	}
+	.fs-alert-close:hover { background: color-mix(in srgb, var(--fs-text) 8%, transparent); color: var(--fs-text); }
+	.fs-alert-close:focus-visible { outline: none; box-shadow: var(--fs-focus-ring); }
+	.fs-alert-close .fs-ico { width: 16px; height: 16px; }
 	/* one component, four LuCI selectors, no markup difference worth honouring: #tabmenu ul.tabs
 	 * (page tabs), ul.cbi-tabmenu.mode (mode switcher), .tabs (view tabs), .cbi-tabmenu (CBI form
 	 * tabs). Active marker: .active on ul.tabs, .cbi-tab on every .cbi-tabmenu flavour. */
 	#tabmenu { margin-bottom: 0; }
 
-	/* the card */
+	/* Fluent Pivot: a bare underline strip on the page — no card, no pills. The container owns
+	 * only the baseline; the active tab paints the 3px accent bar over it (::after, below). */
 	#tabmenu ul.tabs,
 	ul.cbi-tabmenu.mode,
 	.tabs,
 	.cbi-tabmenu {
 		display: flex;
 		flex-wrap: wrap;
-		gap: var(--fs-space-1);
+		gap: calc(var(--fs-space-6) + var(--fs-space-0-5)); /* 26px in the mock */
 		list-style: none;
 		margin: 0 0 var(--fs-card-gap);
-		padding: var(--fs-space-2);
-		background: var(--fs-panel);
-		border: var(--fs-hairline);
-		border-radius: var(--fs-radius-lg);
+		padding: 0;
+		background: transparent;
+		border: 0;
+		border-bottom: var(--fs-hairline);
 		/* zeroes the folder-tab baseline gradient (1px x 29px) instead of restating it, so a
 		 * third-party gradient the strip carries is sized away too */
 		background-size: 0 0;
-	}
-
-	/* a strip nested in .cbi-section -> soft inset row, no frame (a card inside a card reads as a bug) */
-	.cbi-section .tabs,
-	.cbi-section .cbi-tabmenu:not(.mode):not(.map) {
-		background: var(--fs-panel2);
-		padding: var(--fs-space-1-5);
-		box-shadow: none;
 	}
 
 	#tabmenu ul.tabs > li,
@@ -3835,7 +4036,7 @@ body[theme="dark"] #app .module-settings__item {
 		height: auto;
 		margin: 0; padding: 0;
 		border: 0; background: none;
-		border-radius: var(--fs-radius);
+		border-radius: 0;
 		color: var(--fs-dim);
 	}
 
@@ -3858,44 +4059,55 @@ body[theme="dark"] #app .module-settings__item {
 	.tabs > li > a,
 	.cbi-tabmenu > li > a {
 		display: block;
+		position: relative;
 		margin: 0;
-		padding: var(--fs-space-2) var(--fs-space-3-5);
+		/* 10px top / 4px sides / 12px bottom, per the mock — the bottom pad seats the
+		 * underline flush against the strip's baseline */
+		padding: var(--fs-space-2-5) var(--fs-space-1) var(--fs-space-3);
 		border: 0;
-		border-radius: var(--fs-radius);
+		border-radius: 0;
 		line-height: 1.3;
 		font-size: var(--fs-type);
-		font-weight: var(--fs-weight);
+		font-weight: var(--fs-weight-normal);
 		color: var(--fs-dim);
-		transition: background var(--fs-dur), color var(--fs-dur);
+		transition: color var(--fs-dur);
 	}
 
 	#tabmenu ul.tabs > li > a:hover,
 	ul.cbi-tabmenu.mode > li > a:hover,
 	.tabs > li > a:hover,
 	.cbi-tabmenu > li > a:hover {
-		background: var(--fs-accent-soft);
+		background: transparent;
 		color: var(--fs-text);
 	}
 
-	/* active pill */
+	/* active: accent ink + full-width 3px underline overlapping the baseline by 1px */
 	#tabmenu ul.tabs > li.active,
 	ul.cbi-tabmenu.mode > li.cbi-tab,
 	.tabs > li.active,
 	.cbi-tabmenu > li.cbi-tab {
-		color: var(--fs-on-accent);
+		color: var(--fs-accent);
 	}
 	#tabmenu ul.tabs > li.active > a,
 	ul.cbi-tabmenu.mode > li.cbi-tab > a,
 	.tabs > li.active > a,
 	.cbi-tabmenu > li.cbi-tab > a {
+		background: transparent;
+		color: var(--fs-accent);
+		font-weight: var(--fs-weight);
+	}
+	#tabmenu ul.tabs > li.active > a::after,
+	ul.cbi-tabmenu.mode > li.cbi-tab > a::after,
+	.tabs > li.active > a::after,
+	.cbi-tabmenu > li.cbi-tab > a::after {
+		content: ""; position: absolute; inset-inline: 0; bottom: -1px;
+		height: 3px;
 		background: var(--fs-accent);
-		color: var(--fs-on-accent);
-		font-weight: var(--fs-weight-bold);
 	}
 
 	/* one ring for both states, on --fs-focus-ring-solo: base's outline is invisible on the active
-	 * pill, whose background is the same accent — docs/chrome.md "Tab strips" has the contrast
-	 * numbers. box-shadow, not outline, because the strip clips and a shadow is not */
+	 * accent ink, and the ring must clear 3:1 on the page background — docs/chrome.md "Tab
+	 * strips". box-shadow, not outline, because the strip clips and a shadow is not */
 	#tabmenu ul.tabs > li > a:focus-visible,
 	ul.cbi-tabmenu.mode > li > a:focus-visible,
 	.tabs > li > a:focus-visible,
@@ -3905,17 +4117,17 @@ body[theme="dark"] #app .module-settings__item {
 	}
 
 	/* dense1 -> dense2 (fitTabStrips, fs-chrome.js) escalate mutually exclusively on wrap; both
-	 * give the pill the same padding, dense2 alone also tightens the strip's own gap */
+	 * tighten the horizontal padding first, dense2 also closes the strip's own gap */
 	#tabmenu ul.tabs.fs-dense1 > li > a,
 	.tabs.fs-dense1 > li > a,
-	.cbi-tabmenu.fs-dense1 > li > a { padding: var(--fs-space-1) var(--fs-space-2); }
+	.cbi-tabmenu.fs-dense1 > li > a { padding: var(--fs-space-1-5) var(--fs-space-1) var(--fs-space-2); }
 
 	#tabmenu ul.tabs.fs-dense2,
 	.tabs.fs-dense2,
-	.cbi-tabmenu.fs-dense2 { gap: var(--fs-space-1); }
+	.cbi-tabmenu.fs-dense2 { gap: var(--fs-space-4); }
 	#tabmenu ul.tabs.fs-dense2 > li > a,
 	.tabs.fs-dense2 > li > a,
-	.cbi-tabmenu.fs-dense2 > li > a { padding: var(--fs-space-1) var(--fs-space-2); font-size: var(--fs-type); }
+	.cbi-tabmenu.fs-dense2 > li > a { padding: var(--fs-space-1) var(--fs-space-1) var(--fs-space-1-5); font-size: var(--fs-type); }
 
 	/* map-level tabs keep the body font size instead of base's 16.5px/bold */
 	.cbi-tabmenu.map > li { font-size: var(--fs-type); font-weight: var(--fs-weight); }
@@ -4050,8 +4262,8 @@ body[theme="dark"] #app .module-settings__item {
 		gap: var(--fs-space-3);
 		/* nowrap or flexbox wraps the BAR itself instead of the menu's own pills — the signal fitChrome measures */
 		flex-wrap: nowrap;
-		/* aligns the bar to .fs-content so the brand/menu line up with the headings below */
-		padding: 0 max(20px, calc((100% - var(--fs-content-max)) / 2 + var(--fs-content-pad)));
+		/* Fluent mock: a fixed 32px bar gutter — the content column's 64px pad is wider by design */
+		padding: 0 var(--fs-space-8);
 	}
 
 	/* flex:1 opens the gap pushing the right cluster to the column's edge */
@@ -4059,7 +4271,8 @@ body[theme="dark"] #app .module-settings__item {
 		order: 2; flex: 1 1 auto; margin-inline-start: var(--fs-space-2);
 	}
 	:root[data-layout="top"] .fs-sidebar #indicators,
-	:root[data-layout="top"] .fs-themerow,
+	:root[data-layout="top"] .fs-search,
+	:root[data-layout="top"] .fs-vr,
 	:root[data-layout="top"] .fs-logout { order: 3; margin-inline-start: 0; }
 
 	/* The bar keeps the brand on one line: without a flex brandrow, the
@@ -4092,8 +4305,6 @@ body[theme="dark"] #app .module-settings__item {
 		}
 	}
 
-	:root[data-layout="top"] .fs-content { padding-top: var(--fs-space-6); }
-
 	/* .fs-bar-stack: set by fitChrome (fs-chrome.js), not a media query — same reasoning as the header above */
 	:root[data-layout="top"] .fs-sidebar.fs-bar-stack {
 		flex-wrap: wrap; height: auto; padding: var(--fs-space-2-5) var(--fs-space-4);
@@ -4102,13 +4313,12 @@ body[theme="dark"] #app .module-settings__item {
 		order: 3; flex: 1 1 100%; margin-inline-start: 0;
 	}
 	:root[data-layout="top"] .fs-sidebar.fs-bar-stack #indicators,
-	:root[data-layout="top"] .fs-sidebar.fs-bar-stack .fs-themerow,
+	:root[data-layout="top"] .fs-sidebar.fs-bar-stack .fs-search,
+	:root[data-layout="top"] .fs-sidebar.fs-bar-stack .fs-vr,
 	:root[data-layout="top"] .fs-sidebar.fs-bar-stack .fs-logout { order: 2; }
 	:root[data-layout="top"] .fs-sidebar.fs-bar-stack #indicators,
-	:root[data-layout="top"] .fs-sidebar.fs-bar-stack .fs-themerow { margin-inline-start: auto; }
-	:root[data-layout="top"] .fs-sidebar.fs-bar-stack #indicators:not(:empty) ~ .fs-themerow { margin-inline-start: 0; }
-	/* only the FIRST far-edge item keeps the auto margin, restated here — base guard is out-specified (0,4,0 vs 0,2,0) */
-	:root[data-layout="top"] .fs-sidebar.fs-bar-stack .fs-themerow ~ .fs-themerow { margin-inline-start: 0; }
+	:root[data-layout="top"] .fs-sidebar.fs-bar-stack .fs-search { margin-inline-start: auto; }
+	:root[data-layout="top"] .fs-sidebar.fs-bar-stack #indicators:not(:empty) ~ .fs-search { margin-inline-start: 0; }
 
 	/* .fs-ind-compact/.fs-bar-actrow live with the bar in 20-shell.css too — only the top delta lives here */
 
@@ -4121,6 +4331,17 @@ body[theme="dark"] #app .module-settings__item {
 			flex-wrap: wrap;
 			height: auto;
 			padding: var(--fs-space-2-5) var(--fs-space-3);
+			align-items: center;
+		}
+		/* the desktop Pivot look (stretch items + the 26px underline) reverts to pills here:
+		 * a scroll strip has no room for a baseline underline, and stretch would fight the wrap */
+		:root[data-layout="top"] .fs-sidebar ul.nav > li > a {
+			padding: var(--fs-space-1-5) var(--fs-space-3);
+			border-radius: var(--fs-radius);
+		}
+		:root[data-layout="top"] .fs-sidebar ul.nav > li > a.active::after { content: none; }
+		:root[data-layout="top"] .fs-sidebar ul.nav > li > a.active {
+			background: var(--fs-accent-soft); color: var(--fs-accent);
 		}
 		:root[data-layout="top"] .fs-sidebar ul.nav {
 			order: 3;
@@ -4142,11 +4363,24 @@ body[theme="dark"] #app .module-settings__item {
 		}
 		:root[data-layout="top"] .fs-sidebar ul.nav::-webkit-scrollbar { display: none; }
 		:root[data-layout="top"] .fs-sidebar #indicators,
+		:root[data-layout="top"] .fs-search,
+		:root[data-layout="top"] .fs-vr,
 		:root[data-layout="top"] .fs-logout {
 			order: 2;
 			margin-inline-start: 0;
 		}
 		:root[data-layout="top"] .fs-sidebar #indicators { margin-inline-start: auto; }
+		/* the desktop field (248px) crowds the phone bar — give back its kbd first */
+		:root[data-layout="top"] .fs-search-field { width: 180px; }
+		:root[data-layout="top"] .fs-search-field kbd { display: none; }
+	}
+
+	/* phone: the field collapses to a square icon trigger, the panel right-aligns */
+	@media (max-width: 560px) {
+		:root[data-layout="top"] .fs-search-field { width: var(--fs-ctl-h); padding: 0; justify-content: center; }
+		:root[data-layout="top"] .fs-search-field .fs-ph { display: none; }
+		:root[data-layout="top"] .fs-logout .fs-who { display: none; }
+		:root[data-layout="top"] .fs-logout { padding: 0 var(--fs-space-2) 0 var(--fs-space-1); }
 	}
 	/* buttons straight in a field (Enable/Disable, Start/Restart/Stop) only get whitespace
 	 * spacing inline-block, collapsing rows on wrap — wrapping flex with a real gap instead */
@@ -4163,30 +4397,35 @@ body[theme="dark"] #app .module-settings__item {
 		/* auto, stated: theme/60-inputs.css's generic input box says 210x32px, a base reset would lose to it by layer */
 		width: auto; height: auto;
 		min-height: var(--fs-ctl-h);
-		padding: var(--fs-space-2) var(--fs-space-3-5);
-		font-family: var(--fs-font-sans); font-weight: var(--fs-weight); line-height: 1.1;
+		padding: 0 var(--fs-space-5);
+		font-family: var(--fs-font-sans); font-weight: var(--fs-weight); font-size: var(--fs-type); line-height: 1.1;
 		color: var(--fs-text);
-		background: var(--fs-panel2);
-		border: var(--fs-hairline);
+		background: var(--fs-panel);
+		border: 1px solid var(--fs-border-strong);
 		border-radius: var(--fs-radius);
-		box-shadow: none; text-shadow: none;
+		box-shadow: var(--fs-shadow-card); text-shadow: none;
 		/* border-COLOR not the shorthand, which also animates width — a layout animation on every hover */
 		transition: var(--fs-field-transition);
 	}
-	/* bare `button` rides along: harmless on a border:0 box, meaningful once an app gives it one */
+	/* bare `button` rides along: harmless on a border:0 box, meaningful once an app gives it one.
+	 * Fluent secondary hover: a slightly greyer face, a stronger edge and a 2px float. */
 	.cbi-button:hover, .btn:hover, button:hover,
-	input[type="button"]:hover, input[type="submit"]:hover, input[type="reset"]:hover { border-color: var(--fs-dim); }
+	input[type="button"]:hover, input[type="submit"]:hover, input[type="reset"]:hover {
+		background: var(--fs-panel2);
+		border-color: var(--fs-border-strong-hover);
+		transform: translateY(-2px);
+		box-shadow: var(--fs-shadow-hover);
+	}
 
-	/* keyboard focus only: box-shadow:none above kills any stray glow, plain mouse :focus shows
-	 * nothing on purpose — the pressed cue below already answers a click */
+	/* keyboard focus only: the solo ring (surface + solid accent halo) clears 3:1 on the white
+	 * face AND on the solid fills; plain mouse :focus shows nothing on purpose */
 	.cbi-button:focus-visible, .btn:focus-visible,
 	input[type="button"]:focus-visible, input[type="submit"]:focus-visible, input[type="reset"]:focus-visible {
 		outline: none;
-		border-color: var(--fs-accent);
-		box-shadow: var(--fs-focus-ring);
+		box-shadow: var(--fs-focus-ring-solo);
 	}
-	/* solid variants sit ON --fs-accent/-good/-danger, an accent-tinted ring is invisible against
-	 * them — ring in the surface colour with a solid accent halo (--fs-focus-ring-solo) instead */
+	/* solid variants sit ON --fs-accent/-good/-danger: the solo ring above reads on them the
+	 * same way — the surface ring + solid accent halo is the single focus treatment now */
 	.cbi-button-positive:focus-visible, .cbi-button-action:focus-visible,
 	.cbi-button-negative:focus-visible, .cbi-button-remove:focus-visible,
 	.cbi-button-apply:focus-visible, .cbi-button-save:focus-visible,
@@ -4197,10 +4436,11 @@ body[theme="dark"] #app .module-settings__item {
 		box-shadow: var(--fs-focus-ring-solo);
 	}
 
-	/* the sole copy of the pressed inset shadow (base's identical one was absorbed) */
+	/* Fluent pressed: sink back to rest, shrink a touch, no shadow at all */
 	.cbi-button:active, .btn:active, .btn.active,
 	input[type="button"]:active, input[type="submit"]:active, input[type="reset"]:active {
-		box-shadow: inset 0 2px 4px color-mix(in srgb, var(--fs-border) 40%, transparent);
+		transform: translateY(0) scale(.97);
+		box-shadow: none;
 	}
 
 	/* three fills, not six: `.cbi-button-*` (LuCI's own views) and `.btn.<colour-word>` (third-party
@@ -4220,8 +4460,9 @@ body[theme="dark"] #app .module-settings__item {
 	.cbi-button-save:hover, .cbi-button-negative:hover,
 	.btn.success:hover, .btn.info:hover, .btn.danger:hover, .btn.error:hover {
 		filter: var(--fs-hover-lift); border-color: transparent;
+		transform: translateY(-2px); box-shadow: var(--fs-shadow-hover);
 	}
-	.cbi-button-reset, .cbi-button-link { background: transparent; border-color: var(--fs-border); color: var(--fs-dim); }
+	.cbi-button-reset, .cbi-button-link { background: transparent; border-color: var(--fs-border-strong); color: var(--fs-dim); box-shadow: none; }
 
 	/* .btn owns size words in full now: the plain rule above re-sets padding/radius in a later
 	 * layer, so a size word carrying only font-size (base's old copy) got default padding */
@@ -4229,12 +4470,12 @@ body[theme="dark"] #app .module-settings__item {
 	.btn.small { font-size: var(--fs-type-xs); min-height: var(--fs-ctl-h-sm); padding: var(--fs-space-1) var(--fs-space-2-5); border-radius: var(--fs-radius-sm); }
 
 	.cbi-section .table[id] .td .btn,
-	.cbi-section .table[id] .td .cbi-button { padding: var(--fs-space-1) var(--fs-space-2-5); font-size: var(--fs-type); }
+	.cbi-section .table[id] .td .cbi-button { padding: var(--fs-space-1) var(--fs-space-2-5); font-size: var(--fs-type); box-shadow: none; }
 	.alert-message .btn, .alert-message .cbi-button {
 		border-radius: var(--fs-radius); padding: var(--fs-space-2) var(--fs-space-3); font-weight: var(--fs-weight);
-		background: var(--fs-panel2); border: var(--fs-hairline); color: var(--fs-text);
+		background: var(--fs-panel2); border: var(--fs-hairline); color: var(--fs-text); box-shadow: none;
 	}
-	.alert-message .btn:hover { border-color: var(--fs-accent); color: var(--fs-accent); }
+	.alert-message .btn:hover { border-color: var(--fs-accent); color: var(--fs-accent); transform: none; box-shadow: none; }
 
 	/* Save/Apply footer: base renders a tall half-empty plate with bottom-only radius, made a compact rounded bar */
 	.cbi-page-actions {
@@ -4284,8 +4525,9 @@ body[theme="dark"] #app .module-settings__item {
 		font-family: var(--fs-font-sans); font-size: var(--fs-type); font-weight: var(--fs-weight);
 		color: var(--fs-text); background: var(--fs-panel2);
 		border: var(--fs-hairline); border-radius: var(--fs-radius-sm); cursor: pointer;
+		box-shadow: none;
 	}
-	input[type="file"]::file-selector-button:hover { border-color: var(--fs-accent); color: var(--fs-accent); }
+	input[type="file"]::file-selector-button:hover { border-color: var(--fs-accent); color: var(--fs-accent); transform: none; box-shadow: none; }
 
 	/* row-action buttons (Edit/Delete/Start-Stop): neutral outline, variants colour the ones that
 	 * carry meaning. Neutral :hover comes FIRST — after it, it would grey the coloured variants
@@ -4304,8 +4546,9 @@ body[theme="dark"] #app .module-settings__item {
 	.td .cbi-button, .cbi-section-actions .cbi-button, .cbi-section-table .cbi-button {
 		background: transparent;
 		border: var(--fs-hairline); color: var(--fs-dim);
+		box-shadow: none;
 	}
-	.td .cbi-button:hover { border-color: var(--fs-dim); color: var(--fs-text); }
+	.td .cbi-button:hover { border-color: var(--fs-dim); color: var(--fs-text); transform: none; box-shadow: none; }
 
 	.td .cbi-button-action, .td .cbi-button-edit, .td .cbi-button-apply,
 	.cbi-section-actions .cbi-button-edit, .cbi-section-actions .cbi-button-action {
@@ -4374,6 +4617,7 @@ body[theme="dark"] #app .module-settings__item {
 		border: 0; border-inline-start: var(--fs-hairline);
 		border-radius: 0;
 		background: transparent; color: var(--fs-dim);
+		box-shadow: none;
 	}
 	.cbi-dynlist > .add-item > button:hover,
 	.cbi-dynlist > .add-item > .cbi-button-add:hover { color: var(--fs-accent); }
@@ -4382,6 +4626,7 @@ body[theme="dark"] #app .module-settings__item {
 		background: transparent; color: var(--fs-dim);
 		padding: 0 var(--fs-space-3); min-height: var(--fs-ctl-h);
 		border-inline-start: var(--fs-hairline);
+		box-shadow: none;
 	}
 	.control-group:has(> .cbi-input-password) > button.cbi-button-neutral:hover { color: var(--fs-accent); }
 	/* SQUARE, ON THE LADDER: the only buttons once set in bare pixels (40x34, 34 being a height in
@@ -4391,8 +4636,9 @@ body[theme="dark"] #app .module-settings__item {
 		border-radius: var(--fs-radius); border: var(--fs-hairline);
 		background: var(--fs-panel2); color: var(--fs-text);
 		display: inline-flex; align-items: center; justify-content: center;
+		box-shadow: none;
 	}
-	.pager .btn.prev:hover, .pager .btn.next:hover { border-color: var(--fs-accent); color: var(--fs-accent); }
+	.pager .btn.prev:hover, .pager .btn.next:hover { border-color: var(--fs-accent); color: var(--fs-accent); transform: none; box-shadow: none; }
 	/* baseline, not center: a taller field (help sentence under the control) would push a
 	 * centered label off the control's first line */
 	.cbi-value { justify-content: space-between; gap: var(--fs-space-4); padding: var(--fs-space-2) 0; margin: 0; border-bottom: var(--fs-hairline); }
@@ -4479,16 +4725,16 @@ body[theme="dark"] #app .module-settings__item {
 	/* label[for] stays in the DOM but draws nothing: out of flow, out of the flex item count, so gap opens only on the switch input + an optional caption */
 	.cbi-checkbox > label[for] { position: absolute; opacity: 0; width: 0; height: 0; margin: 0; }
 	.cbi-checkbox > input[type="checkbox"] {
-		--sw-w: calc(40px * var(--fs-density-box));
+		--sw-w: calc(44px * var(--fs-density-box));
 		--sw-h: calc(22px * var(--fs-density-box));
-		--sw-knob: calc(16px * var(--fs-density-box));
-		--sw-pad: calc(2px * var(--fs-density-box));
+		--sw-knob: calc(14px * var(--fs-density-box));
+		--sw-pad: calc(4px * var(--fs-density-box));
 		/* appearance/--bd-color/--fg-color come from the shared input[type=checkbox] rule below;
 		 * flex-shrink: 0 keeps the pill at its width beside a caption (task 0145 has the numbers) */
 		display: inline-block; position: relative; margin: 0; flex-shrink: 0;
 		width: var(--sw-w); height: var(--sw-h); border-radius: var(--fs-radius-pill);
-		background: var(--fs-track); border: var(--fs-hairline);
-		cursor: pointer; transition: background var(--fs-dur), border-color var(--fs-dur); vertical-align: middle;
+		background: var(--fs-switch-off); border: 0;
+		cursor: pointer; transition: background var(--fs-dur); vertical-align: middle;
 	}
 	/* hit-target overlay to 44x30 (WCAG 2.5.8 floor 24px, pill is 22px); inset stays literal, not
 	 * density-scaled — a floor that shrinks with Density is not one */
@@ -4496,20 +4742,24 @@ body[theme="dark"] #app .module-settings__item {
 	.cbi-checkbox > input[type="checkbox"]::after {
 		top: var(--sw-pad); inset-inline-start: var(--sw-pad);
 		width: var(--sw-knob); height: var(--sw-knob); border-radius: 50%;
-		background: var(--fs-dim);
+		background: var(--fs-panel); box-shadow: 0 1px 2px rgba(0,0,0,.25);
 		/* transform not `left`: left re-lays out the row every frame, translateX is composited */
 		transform: translateX(0);
 		transition: transform var(--fs-dur-move), background var(--fs-dur);
 	}
-	.cbi-checkbox > input[type="checkbox"]:checked { background: var(--fs-accent); border-color: transparent; }
-	/* derived so it cannot drift from the sizes above; -2px is the pill's two 1px borders (the knob sits against the padding box, so it has 2px less room — travel is 18px not 20) */
+	.cbi-checkbox > input[type="checkbox"]:checked { background: var(--fs-accent); }
+	/* derived so it cannot drift from the sizes above; the borderless track gives the knob the full padding box */
 	.cbi-checkbox > input[type="checkbox"]:checked::after {
-		transform: translateX(calc(var(--sw-w) - var(--sw-knob) - var(--sw-pad) * 2 - 2px));
+		transform: translateX(calc(var(--sw-w) - var(--sw-knob) - var(--sw-pad) * 2));
 		background: var(--fs-on-accent);
 	}
-	/* the input IS the switch, ring goes here; -solo: checked switch already spends its border channel on accent, only the tinted shadow shows */
+	/* mock hover: the track deepens and the knob stretches 2px toward its off end */
+	.cbi-checkbox > input[type="checkbox"]:checked:hover { background: var(--fs-accent-hover); }
+	.cbi-checkbox > input[type="checkbox"]:checked:hover::after {
+		transform: translateX(calc(var(--sw-w) - var(--sw-knob) - var(--sw-pad) * 2 + 2px));
+	}
+	/* the input IS the switch; -solo is the mock's white-inner/blue-outer double ring */
 	.cbi-checkbox > input[type="checkbox"]:focus-visible {
-		border-color: var(--fs-accent);
 		box-shadow: var(--fs-focus-ring-solo);
 	}
 	.cbi-checkbox > input[type="checkbox"]:disabled { opacity: var(--fs-disabled-opacity); cursor: not-allowed; }
@@ -4520,10 +4770,10 @@ body[theme="dark"] #app .module-settings__item {
 	 * exclude it individually below instead. */
 	input[type="checkbox"],
 	input[type="radio"] {
-		--bd-color: var(--fs-border);
+		--bd-color: var(--fs-border-strong);
 		--fg-color: var(--fs-text);
 		/* box tier not space tier: --fs-space-4 gave 16px at Normal but 10.4px at Compact (smaller than any control) and never grew at Large */
-		--box: calc(16px * var(--fs-density-box));
+		--box: calc(20px * var(--fs-density-box));
 		--mark-inset: 3px;
 		/* WCAG 2.5.8's 24px spacing floor holds only while the theme owns the layout; ELEMENT is
 		 * 24px (drawing stays 16px, centred), max() so it never shrinks under --box at Large */
@@ -4555,11 +4805,11 @@ body[theme="dark"] #app .module-settings__item {
 		margin: auto;
 		width: var(--box);
 		height: var(--box);
-		background: linear-gradient(var(--fs-panel), var(--fs-panel2));
+		background: var(--fs-panel);
 		border: 1px solid var(--bd-color);
 		transition: var(--fs-field-transition);
 	}
-	input[type="checkbox"]::before { border-radius: 2px; }
+	input[type="checkbox"]::before { border-radius: 4px; }
 	input[type="radio"],
 	input[type="radio"]::before {
 		border-radius: 50%;
@@ -4582,9 +4832,22 @@ body[theme="dark"] #app .module-settings__item {
 		background: var(--fg-color);
 	}
 	input[type="radio"]:checked:after {
-		/* radio dot filled, not ringed — a ring reads as "not selected" */
-		--checkmark-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><circle cx='12' cy='12' r='6.5' fill='%23000'/></svg>");
+		/* Fluent spec: a solid accent dot on the white face, no mask icon */
+		width: calc(var(--box) - 10px);
+		height: calc(var(--box) - 10px);
+		-webkit-mask: none; mask: none;
+		background: var(--fs-accent);
+		border-radius: 50%;
 	}
+	/* Fluent spec: checked box fills accent, mark turns white */
+	input[type="checkbox"]:not(:where(.cbi-checkbox > input)):checked {
+		--bd-color: var(--fs-accent); --fg-color: var(--fs-on-accent);
+	}
+	input[type="checkbox"]:not(:where(.cbi-checkbox > input)):checked::before { background: var(--fs-accent); }
+	input[type="radio"]:checked { --bd-color: var(--fs-accent); }
+	/* invalid wins the checked fill only where it actually paints: the ::before face and the glyph */
+	input[type="checkbox"].cbi-input-invalid:checked::before { background: var(--fs-danger); }
+	input[type="checkbox"].cbi-input-invalid:checked { --fg-color: var(--fs-on-accent); }
 	input[type="checkbox"].cbi-input-invalid,
 	input[type="radio"].cbi-input-invalid {
 		--bd-color: var(--fs-danger);
@@ -4599,7 +4862,8 @@ body[theme="dark"] #app .module-settings__item {
 		padding: var(--fs-space-1) var(--fs-space-2);
 		background: var(--fs-panel);
 		color: var(--fs-text);
-		border: var(--fs-hairline);
+		border: 1px solid var(--fs-border-strong);
+		border-bottom-color: var(--fs-dim);
 		border-radius: var(--fs-radius);
 	}
 	/* base's old #localtime{width:300px} media rule not moved here: the elastic field width above already out-layers it (measured 440px, not 300) */
@@ -4618,13 +4882,15 @@ body[theme="dark"] #app .module-settings__item {
 	select, select.cbi-input-select, .cbi-value-field select {
 		/* unprefixed only, floor clears it everywhere — docs/css.md "The browser floor" */
 		appearance: none;
-		background-color: var(--fs-panel2);
+		background-color: var(--fs-panel);
 		background-image: var(--fs-select-chevron);
 		/* right inset is the scale step, not a literal 12 — the .cbi-select shell below repeats the same one spelling */
 		background-repeat: no-repeat; background-size: 6px 6px;
 		background-position: right calc(var(--fs-space-3) - 1px) center, right calc(var(--fs-space-3) + 5px) center;
 		padding: var(--fs-space-2) var(--fs-space-8) var(--fs-space-2) var(--fs-space-3);
-		border: var(--fs-hairline); border-radius: var(--fs-radius);
+		border: 1px solid var(--fs-border-strong);
+		border-bottom-color: var(--fs-dim);
+		border-radius: var(--fs-radius);
 		color: var(--fs-text); font-family: var(--fs-font-sans); font-size: var(--fs-type);
 		line-height: 1.3; min-height: var(--fs-ctl-h); cursor: pointer;
 		width: 210px;
@@ -4632,7 +4898,7 @@ body[theme="dark"] #app .module-settings__item {
 		transition: var(--fs-field-transition);
 	}
 	/* height:inherit so the multiple/listbox variant does not take the closed control's one-line height */
-	select[multiple] { background-color: var(--fs-panel2); color: var(--fs-text); height: inherit; }
+	select[multiple] { background-color: var(--fs-panel); color: var(--fs-text); height: inherit; }
 	option { font-size: 100%; line-height: 2em; }
 	select option { background: var(--fs-panel); color: var(--fs-text); }
 
@@ -4672,11 +4938,12 @@ body[theme="dark"] #app .module-settings__item {
 		height: var(--fs-ctl-h);
 		color: var(--fs-text);
 		font-size: var(--fs-type);
-		border: var(--fs-hairline);
+		border: 1px solid var(--fs-border-strong);
+		border-bottom-color: var(--fs-dim);
 		border-radius: var(--fs-radius);
 		padding: 0;
 		position: relative;
-		background-color: var(--fs-panel2);
+		background-color: var(--fs-panel);
 		background-image: var(--fs-select-chevron);
 		background-repeat: no-repeat;
 		background-size: 6px 6px;
@@ -4716,8 +4983,9 @@ body[theme="dark"] #app .module-settings__item {
 	input[type="datetime-local"], input[type="month"], input[type="week"],
 	input[type="color"],
 	textarea {
-		background: var(--fs-panel2);
-		border: var(--fs-hairline);
+		background: var(--fs-panel);
+		border: 1px solid var(--fs-border-strong);
+		border-bottom-color: var(--fs-dim);
 		border-radius: var(--fs-radius);
 		color: var(--fs-text);
 		padding: var(--fs-space-2) var(--fs-space-3);
@@ -4751,31 +5019,54 @@ body[theme="dark"] #app .module-settings__item {
 		margin: calc(16px - var(--fs-radius)) calc(16px - var(--fs-radius)) 0 0;
 	}
 
+	/* Fluent hover: full border darkens, the bottom edge reaches full text colour, face warms one step;
+	 * background-COLOR only — a shorthand would wipe the select's chevron background-image */
 	.cbi-input-text:hover, .cbi-input-password:hover, .cbi-input-textarea:hover,
 	input[type="text"]:hover, input[type="password"]:hover, input[type="number"]:hover,
 	input[type="email"]:hover, input[type="url"]:hover, input[type="search"]:hover,
-	textarea:hover { border-color: var(--fs-dim); }
+	textarea:hover,
+	select:hover, select.cbi-input-select:hover, .cbi-value-field select:hover,
+	.cbi-select:not(select):hover {
+		border-color: var(--fs-border-strong-hover);
+		border-bottom-color: var(--fs-text);
+		background-color: var(--fs-panel2);
+	}
 
-	/* fallback ring for untyped inputs; excludes the toggle switch, whose :focus-visible-only ring must not double up */
+	/* Fluent focus, split three ways. Main group (fields with the space-2 base padding): the bottom
+	 * edge thickens to 2px INSIDE the same envelope — (8+1) -> (7+2) — so nothing reflows. The broad
+	 * fallback excludes file/range: they zero their border/padding, a 2px bottom + compensation would
+	 * mis-shape them; a truly bare input (padding space-1) would take the space-2-based compensation,
+	 * an accepted 4px edge case LuCI does not ship. The toggle switch stays out: its :focus-visible-
+	 * only solo ring must not double up */
 	.cbi-input-text:focus, .cbi-input-password:focus, .cbi-input-textarea:focus,
 	.cbi-section-create-name:focus,
-	input:focus:not(:where(.cbi-checkbox > input)),
+	input:focus:not(:where(.cbi-checkbox > input, [type="file"], [type="range"])),
 	input[type="text"]:focus, input[type="password"]:focus, input[type="number"]:focus,
 	input[type="email"]:focus, input[type="url"]:focus, input[type="search"]:focus,
 	input[type="tel"]:focus, input[type="date"]:focus, input[type="time"]:focus,
 	textarea:focus,
-	select:focus,
-	.cbi-dynlist > .item:focus {
+	select:focus {
 		border-color: var(--fs-accent);
+		border-bottom-width: 2px;
+		padding-bottom: calc(var(--fs-space-2) - 1px);
 		box-shadow: var(--fs-focus-ring);
 		outline: none;
 	}
-	/* same ring, shared by 4 selectors that cannot join the list above; :is() around :has() keeps the list forgiving — unwrapped, a :has() compound sharing a list fails the WHOLE rule below the floor */
+	/* ring-only group, shared by faces that paint their own chrome and must not reflow:
+	 * the checkbox/radio ::before plate, dynlist chips and their add-row; :is() around :has()
+	 * keeps the list forgiving — unwrapped, a :has() compound sharing a list fails the WHOLE rule below the floor */
 	input[type="checkbox"]:not(:where(.cbi-checkbox > input)):focus::before, input[type="radio"]:focus::before,
+	.cbi-dynlist > .item:focus,
+	.cbi-dynlist > .add-item:focus-within {
+		border-color: var(--fs-accent);
+		box-shadow: var(--fs-focus-ring);
+	}
+	/* container group: the .cbi-select shell and the password control-group thicken their bottom edge
+	 * like the main group, but hold no padding of their own to compensate */
 	.cbi-select.focus,
-	.cbi-dynlist > .add-item:focus-within,
 	.control-group:is(:has(> .cbi-input-password)):focus-within {
 		border-color: var(--fs-accent);
+		border-bottom-width: 2px;
 		box-shadow: var(--fs-focus-ring);
 	}
 
@@ -4811,7 +5102,8 @@ body[theme="dark"] #app .module-settings__item {
 	}
 	.cbi-dynlist > .item {
 		background: var(--fs-panel);
-		border: var(--fs-hairline);
+		border: 1px solid var(--fs-border-strong);
+		border-bottom-color: var(--fs-dim);
 		border-radius: var(--fs-radius-sm);
 		color: var(--fs-text);
 		box-shadow: none;
@@ -4838,7 +5130,8 @@ body[theme="dark"] #app .module-settings__item {
 	}
 	.cbi-dynlist > .add-item {
 		align-items: stretch;
-		background: var(--fs-panel2); border: var(--fs-hairline);
+		background: var(--fs-panel2); border: 1px solid var(--fs-border-strong);
+		border-bottom-color: var(--fs-dim);
 		border-radius: var(--fs-radius-sm); overflow: hidden;
 		transition: var(--fs-field-transition);
 	}
@@ -4853,8 +5146,9 @@ body[theme="dark"] #app .module-settings__item {
 	/* input + button as ONE seamless group; gap:0 is load-bearing — base gives every .control-group a gap, this is the one whose members must touch */
 	.control-group:has(> .cbi-input-password) {
 		display: inline-flex; align-items: stretch; gap: 0;
-		background: var(--fs-panel2);
-		border: var(--fs-hairline);
+		background: var(--fs-panel);
+		border: 1px solid var(--fs-border-strong);
+		border-bottom-color: var(--fs-dim);
 		border-radius: var(--fs-radius);
 		overflow: hidden;
 		transition: var(--fs-field-transition);
@@ -5480,8 +5774,8 @@ body[theme="dark"] #app .module-settings__item {
 		}
 		.cbi-checkbox > input[type="checkbox"]::after { background: ButtonBorder; }
 		.cbi-checkbox > input[type="checkbox"]:checked::after { background: HighlightText; }
-		/* icon-only buttons (rail toggle, search/appearance, logout) lose their hover fill */
-		.fs-railtoggle, .fs-themerow { border-color: ButtonBorder; }
+		/* icon-only controls (rail toggle, search field, logout) lose their hover fill */
+		.fs-railtoggle, .fs-search-field { border-color: ButtonBorder; }
 		/* box-shadow is dropped entirely in forced-colors */
 		:focus-visible { outline: 2px solid Highlight; outline-offset: 1px; }
 	}
@@ -5496,10 +5790,10 @@ body[theme="dark"] #app .module-settings__item {
 			--fs-shadow-pop: none;
 			--fs-bar-bg: #fff;
 		}
-		/* nav/search/actions unusable on paper; Appearance is a PAGE now, stays and prints */
+		/* nav/search/actions unusable on paper */
 		.fs-sidebar.fs-sidebar.fs-sidebar.fs-sidebar,
 		.fs-skip.fs-skip,
-		.fs-search-ov.fs-search-ov,
+		.fs-search.fs-search,
 		.cbi-page-actions.cbi-page-actions,
 		.cbi-tabmenu.cbi-tabmenu,
 		footer { display: none; }
@@ -5515,76 +5809,284 @@ body[theme="dark"] #app .module-settings__item {
 	}
 }
 @layer page {
-	/* LOGIN — themes/footstrap/sysauth.ut's own template, centred card, no chrome. Scoped by
-	 * `.fs-login`, a class the template puts on the form: replaced
+	/* LOGIN — themes/footstrap/sysauth.ut's own template, redrawn from the Fluent mock:
+	 * preview/fluent/src/01-login.html + fluent.css "登录页" (715-803). Three acrylic layers on
+	 * one fixed wash: the hostname tip, the card, and the grid/sweep the body paints itself.
+	 * Scoped by `.fs-login`, a class the template puts on the form: replaced
 	 * `form:has(> .cbi-map input[name="luci_username"])`, 49 chars × 17 rules (~0.8 KB) matching
 	 * nothing else. Never turn this into a JS-revealed modal: the view runs pre-session, RPCs answer
-	 * "Access denied", render() never runs. docs/css.md "Login: a definite width, not max-width". */
-	/* keeps a gap when the card is taller than the viewport and auto margins collapse to 0 */
-	body:has(> .fs-login) { padding: var(--fs-space-4); }
-	.fs-login {
-		/* DEFINITE width, never max-width: a direct flex item of <body> collapses to min-content
-		 * (~131px) under max-width alone — docs/css.md above. */
-		width: min(400px, calc(100% - 32px));
-		/* body is a min-height:100% flex column: auto margins centre the card
-		 * on BOTH axes (the old 7vh top margin left it riding high on wide screens) */
-		margin: auto;
-		background: var(--fs-panel); border: var(--fs-hairline); border-radius: var(--fs-radius-lg);
-		/* the token, not a literal 45%-black 60px halo: that ignored the palette. */
-		padding: var(--fs-space-6) var(--fs-space-6) var(--fs-space-6); box-shadow: var(--fs-shadow-pop);
+	 * "Access denied", render() never runs. docs/css.md "Login: a definite width, not max-width".
+	 * The page runs PRE-session, so the whole body.logged-in guard is inert here — no unlayered
+	 * mirror to fight, every override below only races base. */
+
+	/* the mock's .login-bg, painted by the body (its pseudo-elements are free — 15-wallpaper.css
+	 * claims only :root and .fs-pattern; the opaque gradients here cover both). Fixed attachment:
+	 * the wash stays viewport-locked, exactly the mock's absolute full-bleed layer. */
+	body:has(> form.fs-login) {
+		padding: var(--fs-space-4);	/* a gap when the card is taller than the viewport */
+		background:
+			radial-gradient(1200px 760px at 12% -10%, #c7e0f4 0%, transparent 55%),
+			radial-gradient(1000px 700px at 88% 108%, #deecf9 0%, transparent 58%),
+			radial-gradient(720px 520px at 74% 12%, rgba(255, 255, 255, .95) 0%, transparent 55%),
+			linear-gradient(158deg, #e8f1fa 0%, #eef3f9 48%, #e6eef7 100%);
+		background-attachment: fixed;
 	}
-	/* router hostname, not the eyebrow tokens: those force uppercase and a hostname is a name
-	 * (case is the only thing telling two similar ones apart). docs/css.md above. */
+	/* the mock's .login-grid, on ::before. z-index:0 + the raised form below: a fixed
+	 * pseudo-element paints with positioned content, so an unpositioned form would slide UNDER it. */
+	body:has(> form.fs-login)::before {
+		content: "";
+		position: fixed; inset: 0; z-index: 0;
+		pointer-events: none;
+		background-image:
+			linear-gradient(rgba(0, 90, 158, .045) 1px, transparent 1px),
+			linear-gradient(90deg, rgba(0, 90, 158, .045) 1px, transparent 1px);
+		background-size: 64px 64px;
+		-webkit-mask-image: radial-gradient(1200px 800px at 50% 42%, #000 30%, transparent 78%);
+		mask-image: radial-gradient(1200px 800px at 50% 42%, #000 30%, transparent 78%);
+	}
+	/* the mock's .login-bg::after sweep light, on ::after — static, exactly as drawn */
+	body:has(> form.fs-login)::after {
+		content: "";
+		position: fixed; inset: -20%; z-index: 0;
+		pointer-events: none;
+		background: linear-gradient(115deg, transparent 42%, rgba(255, 255, 255, .55) 50%, transparent 58%);
+	}
+
+	/* the form is the mock's .login-wrap: a centred column holding the tip and the card.
+	 * DEFINITE width, never max-width: a direct flex item of <body> collapses to min-content
+	 * (~131px) under max-width alone — docs/css.md above. */
+	form.fs-login {
+		position: relative; z-index: 1;
+		display: flex; flex-direction: column; align-items: center;
+		gap: 26px;	/* the mock's .login-wrap gap between tip and card */
+		width: min(480px, calc(100% - 32px));
+		margin: auto;
+	}
+	/* a plugin's alert plate spans the column, never shrinks to its text */
+	.fs-login > .alert-message { width: 100%; margin: 0; border-radius: var(--fs-radius); }
+
+	/* the mock's .login-foot: one muted line under the card, b holds the product name */
+	.fs-login-foot {
+		display: flex; align-items: center; gap: 8px;
+		margin: 0;
+		font-size: 12px; color: var(--fs-faint);
+	}
+	.fs-login-foot b { color: var(--fs-dim); font-weight: var(--fs-weight); }
+
+	/* the hostname, restyled as the mock's .login-tip: a small acrylic pill floating above the
+	 * card. Not the eyebrow tokens: a hostname is a name (case is the only thing telling two
+	 * similar ones apart). docs/css.md above. */
 	.fs-login-host {
-		margin: 0 0 var(--fs-space-6); text-align: center;
-		font-size: var(--fs-type-lg); font-weight: var(--fs-weight-bold); color: var(--fs-dim);
+		display: inline-flex; align-items: center; gap: 8px;
+		max-width: 100%; box-sizing: border-box;
+		margin: 0; padding: 8px 16px;
+		background: rgba(255, 255, 255, .6);
+		-webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+		border: 1px solid rgba(255, 255, 255, .65);
+		border-radius: var(--fs-radius-pill);
+		box-shadow: var(--fs-shadow-card);	/* the mock's --s2 */
+		font-size: 12px; color: var(--fs-dim);
 		overflow-wrap: anywhere;
 	}
+
+	/* the mock's .login-card: 480px acrylic, 44/44/36, the pop shadow. Lives on the wrapper
+	 * sysauth.ut adds around the cbi-map + actions — the form itself is the wrap column. */
+	.fs-login-card {
+		width: 100%; box-sizing: border-box;
+		padding: 44px 44px 36px;
+		background: rgba(255, 255, 255, .7);
+		-webkit-backdrop-filter: blur(30px) saturate(140%); backdrop-filter: blur(30px) saturate(140%);
+		border: 1px solid rgba(255, 255, 255, .6);
+		border-radius: var(--fs-radius-lg);
+		box-shadow: var(--fs-shadow-pop);	/* the mock's --s8 */
+	}
+	/* strip the cbi frames: the card IS the panel; a second frame here would nest one inside it */
 	.fs-login .cbi-map,
 	.fs-login .cbi-section,
 	.fs-login .cbi-section-node {
 		background: none; border: 0; padding: 0; margin: 0; box-shadow: none;
 	}
-	/* the login card IS the panel; a second frame here would nest one inside it */
+	/* the head is the mock's .login-head: logo, title, descr, all centred */
+	.fs-login .cbi-map {
+		display: flex; flex-direction: column; align-items: center; text-align: center;
+	}
 	.fs-login .cbi-map > h1,
 	.fs-login .cbi-map-descr {
 		background: none; border: 0; border-radius: 0; box-shadow: none; padding: 0;
 	}
-	/* h1, not h2: no title bar on this page to carry the document's h1, so sysauth.ut emits it here
-	 * and the ramp's own h1 size wraps at 400px — reset to h2's size. docs/css.md above. */
+	/* the mock's .login-logo: a 64px rounded tile on the blue ramp, a 34px router glyph.
+	 * The markup lands in sysauth.ut; until then this rule simply never matches. */
+	.fs-login-logo {
+		display: grid; place-items: center;
+		width: 64px; height: 64px;
+		margin: 0 0 16px;
+		border-radius: 16px;
+		/* the mock's ramp verbatim: #2b95e0 -> --blue 58% -> --blue-active; no tokens at those steps */
+		background: linear-gradient(160deg, #2b95e0 0%, var(--fs-accent) 58%, #005a9e 100%);
+		color: var(--fs-on-accent);
+		/* the mock's --s4 — a half-step between card and hover the token ladder skips */
+		box-shadow: 0 3.2px 7.2px rgba(0, 0, 0, .13), 0 .6px 1.8px rgba(0, 0, 0, .10);
+	}
+	.fs-login-logo svg { width: 34px; height: 34px; }
+	/* h1, not h2: no title bar on this page to carry the document's h1, so sysauth.ut emits it here.
+	 * The mock's .login-title: 22px/600, -.01em. */
 	.fs-login .cbi-map > h1 {
-		font-size: var(--fs-type-xl); font-weight: var(--fs-weight-bold); letter-spacing: -.01em; margin: 0 0 var(--fs-space-1-5);
+		font-size: 22px; font-weight: var(--fs-weight); letter-spacing: -.01em;
+		margin: 0; color: var(--fs-text);
 	}
-	.fs-login .cbi-map-descr { color: var(--fs-dim); font-size: var(--fs-type); margin: 0 0 var(--fs-space-5); }
-	/* label and its control share ONE row: fixed-width title, fluid field */
+	/* the mock's .login-desc: 13px secondary ink, 5px under the title, 26px above the form
+	 * (the .login-head margin-bottom) */
+	.fs-login .cbi-map-descr { font-size: 13px; color: var(--fs-dim); margin: 5px 0 0; }
+	.fs-login .cbi-map .cbi-section { width: 100%; margin-top: 26px; }
+
+	/* fields STACK, label above its control — the mock's .field, 16px between fields */
+	.fs-login .cbi-section-node { display: flex; flex-direction: column; gap: 16px; }
 	.fs-login .cbi-value {
-		display: flex; align-items: center; gap: var(--fs-space-4);
-		border: 0; padding: 0 0 var(--fs-space-4); margin: 0;
+		display: flex; flex-direction: column; align-items: stretch; gap: 6px;
+		border: 0; padding: 0; margin: 0;
 	}
+	/* the mock's .field > label: 13px/600, normal case, full ink — not the eyebrow idiom */
 	.fs-login .cbi-value-title {
-		flex: 0 0 4.5em; width: auto; max-width: none; padding: 0; text-align: start;
-		font-size: var(--fs-type-xs); font-weight: var(--fs-eyebrow-weight); letter-spacing: var(--fs-eyebrow-tracking); text-transform: uppercase; color: var(--fs-eyebrow-color);
+		width: auto; max-width: none; padding: 0; text-align: start;
+		font-size: 13px; font-weight: var(--fs-weight); letter-spacing: 0; text-transform: none;
+		color: var(--fs-text);
 	}
 	.fs-login .cbi-value-field {
-		flex: 1 1 auto; min-width: 0; width: auto; margin: 0; padding: 0;
+		flex: none; width: 100%; margin: 0; padding: 0;
 	}
 	.fs-login .cbi-value-field input {
 		width: 100%; margin: 0; box-sizing: border-box;
+		height: var(--fs-control-h);	/* the mock's 40px field box */
 	}
-	.fs-login .alert-message { margin: 0 0 var(--fs-space-3-5); border-radius: var(--fs-radius); }
-	/* column, not block: an auth plugin's second action (Reset) glues to Login under margin:0 */
+	/* the mock's .hint, when an auth plugin ships one */
+	.fs-login .cbi-value-description { margin: 0; font-size: 11.5px; color: var(--fs-faint); }
+
+	/* the mock's .login-btn (btn-primary btn-lg): full width, 44px, the accent fill.
+	 * column, not block: an auth plugin's second action (Reset) glues to Login under margin:0 */
 	.fs-login .cbi-page-actions {
 		display: flex; flex-direction: column; gap: var(--fs-space-2-5);
 		background: none; border: 0;
-		padding: 0; margin: var(--fs-space-1-5) 0 0; text-align: start;
+		padding: 0; margin: 16px 0 0; text-align: start;
+		width: 100%;
 	}
 	.fs-login .cbi-page-actions .btn,
 	.fs-login .cbi-page-actions input[type="submit"] {
-		width: 100%; box-sizing: border-box; min-height: var(--fs-ctl-h-lg); margin: 0; border-radius: var(--fs-radius-lg);
+		width: 100%; box-sizing: border-box; min-height: var(--fs-ctl-h-lg); margin: 0;
+		border-radius: var(--fs-radius);
 		background: var(--fs-accent); color: var(--fs-on-accent);
-		border: 0; font-weight: var(--fs-weight-bold); font-size: var(--fs-type-lg);
+		border: 0; font-weight: var(--fs-weight); font-size: 14.5px;
+		box-shadow: var(--fs-shadow-card);	/* the mock's --s2 on .btn */
+		transition: background-color var(--fs-dur), transform var(--fs-dur-move), box-shadow var(--fs-dur);
 	}
-	.fs-login .cbi-page-actions .btn:hover { filter: var(--fs-hover-lift); }
+	/* the mock's .btn-primary.is-hover: deepen + lift 2px + the --s4 shadow */
+	.fs-login .cbi-page-actions .btn:hover,
+	.fs-login .cbi-page-actions input[type="submit"]:hover {
+		background: var(--fs-accent-hover);
+		transform: translateY(-2px);
+		box-shadow: 0 3.2px 7.2px rgba(0, 0, 0, .13), 0 .6px 1.8px rgba(0, 0, 0, .10);
+	}
+	/* the mock's .btn-primary.is-active: darkest blue, no lift, no shadow */
+	.fs-login .cbi-page-actions .btn:active,
+	.fs-login .cbi-page-actions input[type="submit"]:active {
+		background: #005a9e;
+		transform: translateY(0) scale(.97);
+		box-shadow: none;
+	}
+	/* keyboard focus mirrors the mock's .btn.is-focus double ring */
+	.fs-login .cbi-page-actions .btn:focus-visible,
+	.fs-login .cbi-page-actions input[type="submit"]:focus-visible {
+		box-shadow: var(--fs-focus-ring-solo);
+	}
+
+	/* the card keeps its 44/44/36 until the viewport crowds it, then breathes with the scale */
+	@media (max-width: 560px) {
+		.fs-login-card { padding: var(--fs-space-6) var(--fs-space-5); }
+	}
+	/* The Fluent page head injected by menu-basalt.js: breadcrumb over a
+	 * large title, the stock .cbi-page-actions migrated to the right
+	 * edge. The head mounts before #tabmenu so the DOM reads head →
+	 * tabs → alerts → content. */
+
+	.fs-pghead {
+		display: flex;
+		align-items: flex-end;
+		justify-content: space-between;
+		flex-wrap: wrap;
+		gap: var(--fs-space-4);
+		margin: 0 0 var(--fs-space-5);
+	}
+	.fs-pghead-main { min-width: 0; }
+
+	/* "Network › Interfaces" — decorative: the sr-only .fs-title carries
+	 * the real heading, the crumbs are wayfinding only */
+	.fs-crumbs {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		margin: 0 0 6px;
+		font-size: var(--fs-type-xs);
+		color: var(--fs-faint);
+	}
+	.fs-crumbs span + span::before {
+		content: "›";
+		margin-inline-end: 8px;
+	}
+
+	.fs-pg-title {
+		font-size: var(--fs-type-2xl);
+		font-weight: var(--fs-weight);
+		line-height: var(--fs-leading-tight);
+		letter-spacing: -0.01em;
+		color: var(--fs-text);
+	}
+
+	/* the migrated stock bar; guard mirrors this (unlayered always wins) */
+	.fs-pg-actions { display: flex; align-items: center; gap: 10px; }
+	.fs-pg-actions .cbi-page-actions { padding: 0; margin: 0; }
+
+	/* card head for sectioned pages (interfaces list): a full-bleed
+	 * strip riding the card's own padding; mirror of .fs-ovl-head in
+	 * styles/pages/20-overview.css — keep the two in sync */
+	.fs-card-head {
+		display: flex;
+		align-items: center;
+		gap: var(--fs-space-2);
+		margin: calc(var(--fs-card-pad) * -1) calc(var(--fs-card-pad) * -1) var(--fs-space-3);
+		padding: var(--fs-space-3) var(--fs-card-pad);
+		border-bottom: var(--fs-hairline);
+	}
+	.fs-card-ico {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 32px;
+		height: 32px;
+		flex: 0 0 auto;
+		border-radius: var(--fs-radius-sm);
+		background: var(--fs-accent-fill);
+		color: var(--fs-accent);
+	}
+	.fs-card-ico .fs-ico { width: 18px; height: 18px; }
+	.fs-card-title {
+		margin: 0;
+		font-size: var(--fs-type-lg);
+		font-weight: var(--fs-weight);
+		line-height: var(--fs-leading-tight);
+		flex: 1 1 auto;
+		min-width: 0;
+	}
+	.fs-card-more { margin-inline-start: auto; }
+	.fs-card-head .cbi-button { min-height: var(--fs-ctl-h-sm); }
+
+	/* narrow: the actions bar drops under the title. A media query, not
+	 * @container: the containers (45-misc.css) sit on #view/.cbi-map —
+	 * siblings of the head, so a container query here never matches. */
+	@media (max-width: 600px) {
+		.fs-pghead {
+			align-items: stretch;
+			flex-direction: column;
+		}
+	}
 	/* Every !important here fights an inline style= from luci-mod-status's 29_ports.js — page is
 	 * the last layer, so a flag fighting only another footstrap rule is not kept. docs/css.md
 	 * "Overview: the port-tile reskin". */
@@ -5641,26 +6143,61 @@ body[theme="dark"] #app .module-settings__item {
 	/* hideEmptyCard() marks a stock include with nothing to show; drop it */
 	:where(#view)[data-page="admin-status-overview"] .cbi-section.fs-ovl-empty { display: none; }
 
-	/* stock <h2> duplicate of the chrome's title; via .fs-content not #view — docs/css.md above */
+	/* stock <h2> duplicate of the chrome's title; via .fs-content not #view — docs/css.md above.
+	 * menu-basalt.js consumes it into the card head; this stays for no-JS renders. */
 	.fs-content[data-page="admin-status-overview"] h2[name="content"] { display: none; }
+
+	/* The include cards, grouped into .fs-ovl by menu-basalt.js. 12 columns so the
+	 * three measured row ratios of the mockup land on whole tracks: system 8/12
+	 * vs memory column 4/12 (the 2:1 row A), interfaces 5/12 vs leases 7/12
+	 * (the 3:4 row C). docs/css.md "Overview: the grid". */
 	.fs-ovl {
 		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: var(--fs-space-4);
+		grid-template-columns: repeat(12, minmax(0, 1fr));
+		gap: var(--fs-card-gap);
 		margin-bottom: var(--fs-card-gap);	/* match stock .cbi-section spacing below the grid */
 	}
-	/* min-width:0 so an item shrinks to its TRACK, not its content's min-width — docs/css.md above */
-	.fs-ovl > .fs-ovl-sys,
-	.fs-ovl > .fs-ovl-mem,
-	.fs-ovl > .fs-ovl-sto { margin: 0; min-width: 0; }
-	.fs-ovl > .fs-ovl-sys { grid-column: 1; grid-row: 1 / 3; }
-	.fs-ovl > .fs-ovl-mem { grid-column: 2; grid-row: 1; }
-	.fs-ovl > .fs-ovl-sto { grid-column: 2; grid-row: 2; }
+	/* grid children carry no stock flow spacing — the grid's gap is the rhythm.
+	 * min-width:0 so an item shrinks to its TRACK, not its content's min-width — docs/css.md above */
+	.fs-ovl > * { grid-column: 1 / -1; margin: 0; min-width: 0; }
+	.fs-ovl > .fs-ovl-sys { grid-area: 1 / 1 / 3 / 9; }
+	.fs-ovl > .fs-ovl-mem { grid-area: 1 / 9 / 2 / 13; }
+	.fs-ovl > .fs-ovl-sto { grid-area: 2 / 9 / 3 / 13; }
+	/* no storage include rendered: memory takes the whole right column (menu-basalt.js
+	 * toggles .fs-ovl-nosto on the grid) */
+	.fs-ovl.fs-ovl-nosto > .fs-ovl-mem { grid-area: 1 / 9 / 3 / 13; }
+	.fs-ovl > .fs-ovl-net   { grid-column: 1 / 6; }
+	.fs-ovl > .fs-ovl-lease { grid-column: 6 / 13; }
 	@container fs-view (max-width: 800px) {
 		.fs-ovl { grid-template-columns: 1fr; }
-		.fs-ovl > .fs-ovl-sys,
-		.fs-ovl > .fs-ovl-mem,
-		.fs-ovl > .fs-ovl-sto { grid-column: 1; grid-row: auto; }
+		.fs-ovl > * { grid-column: 1; grid-row: auto; }
+	}
+
+	/* card head, rebuilt from the stock <h2> by menu-basalt.js: soft accent
+	 * icon chip + localized title; spacing to the card body below */
+	.fs-ovl-head {
+		display: flex;
+		align-items: center;
+		gap: var(--fs-space-2);
+		margin: 0 0 var(--fs-space-3);
+	}
+	.fs-ovl-ico {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 32px;
+		height: 32px;
+		flex: 0 0 auto;
+		border-radius: var(--fs-radius-sm);
+		background: var(--fs-accent-fill);
+		color: var(--fs-accent);
+	}
+	.fs-ovl-ico .fs-ico { width: 18px; height: 18px; }
+	.fs-ovl-title {
+		margin: 0;
+		font-size: var(--fs-type-lg);
+		font-weight: var(--fs-weight);
+		line-height: var(--fs-leading-tight);
 	}
 
 	/* Port status reskin. Scoped to :has(img[src*="/port_"]) — do not unscope, Network/Wireless

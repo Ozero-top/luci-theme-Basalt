@@ -1,25 +1,16 @@
 @layer theme {
-	/* Basalt v2: page cards are translucent so the built-in body
-	 * texture reads through them. Only the big content surfaces are
-	 * affected — nav dropdowns, modal dialogs, the tab strip, alerts,
-	 * inputs and DATA TABLES keep their opaque surface for legibility.
-	 *
-	 * 88% panel: the 76% fill let the high-contrast motif through hard
-	 * enough to blur card edges and fight dense table text in audits; 88%
-	 * still reads as glass over the texture while holding a clean edge and
-	 * full text contrast. Bare .table stays opaque — a standalone table is
-	 * a reading surface, not a card, and dense grids (leases, stations)
-	 * must not float over the motif. Engines without color-mix() get the
-	 * plain opaque panel (the @supports block simply drops). */
-	@supports (background: color-mix(in srgb, red 50%, transparent)) {
-		.cbi-section,
-		.cbi-map > .cbi-section-node,
-		fieldset.cbi-section,
-		.panel {
-			background-color: color-mix(in srgb, var(--fs-panel) 88%, transparent);
-		}
-		/* a nested data table must not stack two translucent fills;
-		 * 30-tables strips its frame on the same shape, keep the paint paired */
-		.cbi-section .table:is([id], .fs-dt) { background: none; }
+	/* Basalt v2.1 (Fluent): page cards are OPAQUE white. The mock keeps the
+	 * acrylic glass in the bar, popovers and the login card — reading
+	 * surfaces (cards, tables, forms) stay solid for contrast and clean
+	 * edges. This slice now only pins the panel paint and keeps the nested
+	 * table strip paired with it. */
+	.cbi-section,
+	.cbi-map > .cbi-section-node,
+	fieldset.cbi-section,
+	.panel {
+		background-color: var(--fs-panel);
 	}
+	/* a nested data table must not stack a second fill over the card's;
+	 * 30-tables strips its frame on the same shape, keep the paint paired */
+	.cbi-section .table:is([id], .fs-dt) { background: none; }
 }

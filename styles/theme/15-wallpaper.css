@@ -12,10 +12,23 @@
 	:root {
 		--fs-pattern-url: url("/luci-static/basalt/pattern/texture.svg");
 		--fs-pattern-size: 260px;
-		--fs-pattern-strength: .22;
+		/* Fluent light: the motif survives only as a whisper over the Mica wash */
+		--fs-pattern-strength: .05;
 	}
 
-	:root[data-layout="top"] { background-color: var(--fs-bg); }
+	/* Fluent Mica: two cool radial lights over the warm neutral ramp, plus the
+	 * faint blueprint dot grid the mock paints behind the cards. */
+	:root[data-layout="top"] {
+		background-color: var(--fs-bg);
+		background-image:
+			radial-gradient(circle, rgba(0, 90, 158, .05) 1px, transparent 1.5px),
+			radial-gradient(1100px 620px at 4% -6%, rgba(222, 236, 249, .9), transparent 70%),
+			radial-gradient(950px 560px at 99% 104%, rgba(199, 224, 244, .55), transparent 70%),
+			linear-gradient(180deg, #f6f7f8 0%, var(--fs-bg) 46%, #eff1f4 100%);
+		background-size: 22px 22px, auto, auto, auto;
+		background-repeat: repeat, no-repeat, no-repeat, no-repeat;
+		background-attachment: fixed;
+	}
 	:root[data-layout="top"] body,
 	:root[data-layout="top"] .fs-main { background-color: transparent; }
 	:root[data-layout="top"] footer.fs-footer { background: transparent; }

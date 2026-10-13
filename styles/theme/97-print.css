@@ -10,10 +10,10 @@
 			--fs-shadow-pop: none;
 			--fs-bar-bg: #fff;
 		}
-		/* nav/search/actions unusable on paper; Appearance is a PAGE now, stays and prints */
+		/* nav/search/actions unusable on paper */
 		.fs-sidebar.fs-sidebar.fs-sidebar.fs-sidebar,
 		.fs-skip.fs-skip,
-		.fs-search-ov.fs-search-ov,
+		.fs-search.fs-search,
 		.cbi-page-actions.cbi-page-actions,
 		.cbi-tabmenu.cbi-tabmenu,
 		footer { display: none; }

@@ -69,6 +69,8 @@
 		flex-direction: row; flex-wrap: wrap; align-items: center;
 		gap: var(--fs-space-2-5); padding: var(--fs-space-2-5) var(--fs-space-4);
 		background: var(--fs-bar-bg);
+		-webkit-backdrop-filter: blur(24px) saturate(125%);
+		backdrop-filter: blur(24px) saturate(125%);
 		border-inline-end: 0; border-bottom: var(--fs-hairline);
 		/* the submenu popups anchor to this bar and must escape it */
 		overflow: visible;
@@ -85,16 +87,19 @@
 	 * (fs-chrome.js fitChrome adds .fs-bar-stack when it does NOT fit). */
 	.fs-sidebar ul.nav {
 		order: 3; flex: 1 1 100%;
-		flex-direction: row; flex-wrap: wrap; align-items: center; gap: var(--fs-space-0-5);
+		flex-direction: row; flex-wrap: wrap; align-items: stretch; gap: var(--fs-space-1);
 	}
 	/* anchors the dropdown to its OWN item, not the bar — issue #19, chrome.md, "A bar dropdown
 	 * anchors to its own <li>". A phone never shows it: `hover: none` disables the rule. */
 	.fs-sidebar ul.nav > li.has-sub { position: relative; }
+	/* Fluent Pivot: items stretch the bar's full height, ink at rest, the 26px underline
+	 * (10-chrome.css ::after) carries the active state */
 	.fs-sidebar ul.nav > li > a {
 		display: flex; align-items: center;
-		padding: var(--fs-space-1-5) var(--fs-space-3); border-radius: var(--fs-radius);
-		color: var(--fs-dim);
-		font-size: var(--fs-type); font-weight: var(--fs-weight); white-space: nowrap;
+		position: relative;
+		padding: 0 var(--fs-space-4); border-radius: var(--fs-radius) var(--fs-radius) 0 0;
+		color: var(--fs-text);
+		font-size: var(--fs-type); font-weight: var(--fs-weight-normal); white-space: nowrap;
 	}
 	/* a bar item is its label: no icon, no chevron */
 	.fs-sidebar ul.nav > li > a .fs-ico,
@@ -108,7 +113,9 @@
 		position: absolute; inset-inline: 0 auto; top: calc(100% + 8px); z-index: var(--fs-z-flyout);
 		width: max-content; min-width: 200px; max-width: calc(100vw - 32px);
 		margin: 0; padding: var(--fs-space-2);
-		background: var(--fs-panel);
+		background: color-mix(in srgb, var(--fs-panel) 88%, transparent);
+		-webkit-backdrop-filter: blur(30px) saturate(125%);
+		backdrop-filter: blur(30px) saturate(125%);
 		border: var(--fs-hairline);
 		border-radius: var(--fs-radius-lg); box-shadow: var(--fs-shadow-pop);
 	}
@@ -131,7 +138,7 @@
 		color: var(--fs-dim); font-size: var(--fs-type); font-weight: var(--fs-weight);
 	}
 
-	/* right cluster: the poll pill, then Appearance and Log out as square icon buttons.
+	/* right cluster: the poll pill, then the Search field, a divider and the user chip.
 	 * LuCI's #indicators (poll "Refreshing", unsaved changes) collapses when empty, so it
 	 * only shows when there is something to report. */
 	.fs-sidebar #indicators {
@@ -139,18 +146,75 @@
 		order: 2; margin-inline-start: auto; padding: 0;
 	}
 
-	.fs-themerow {
-		display: flex; align-items: center; justify-content: center;
-		flex: 0 0 auto; order: 2; margin-inline-start: auto;
+	/* Search: a trigger FIELD anchoring a flyout panel (menu-basalt.js fills it). The
+	 * container carries position:relative for the panel and the far-edge auto margin;
+	 * the field itself is a plain flat control — Fluent mock: 248px wide, no shadow. */
+	.fs-search {
+		position: relative; display: flex; flex: 0 0 auto;
+		order: 2; margin-inline-start: auto;
 		/* see the :not(:empty) rule below — two auto margins would SPLIT the free space between
 		 * them instead of pushing one cluster to the bar's far edge */
-		width: var(--fs-btn-size); height: var(--fs-btn-size); padding: 0;
+	}
+	.fs-search-field {
+		display: flex; align-items: center; gap: var(--fs-space-2);
+		width: 248px; height: var(--fs-ctl-h); padding: 0 var(--fs-space-2-5);
 		border: var(--fs-hairline); border-radius: var(--fs-radius);
-		background: transparent; color: var(--fs-dim);
-		font: inherit; font-weight: var(--fs-weight); font-size: var(--fs-type); line-height: 1.1;
+		background: color-mix(in srgb, var(--fs-panel) 90%, transparent);
+		color: var(--fs-dim); font: inherit; font-size: var(--fs-type); line-height: 1.1;
 		text-align: start; cursor: pointer;
 		transition: background var(--fs-dur), border-color var(--fs-dur), color var(--fs-dur);
 	}
+	.fs-search-field .fs-ico { width: 16px; height: 16px; flex: 0 0 auto; }
+	.fs-search-field .fs-ph {
+		flex: 1 1 auto; min-width: 0; overflow: hidden;
+		white-space: nowrap; text-overflow: ellipsis;
+	}
+	.fs-search-field kbd {
+		flex: 0 0 auto; padding: 1px var(--fs-space-1-5);
+		border: var(--fs-hairline); border-radius: var(--fs-radius-sm);
+		background: color-mix(in srgb, var(--fs-text) 4%, transparent);
+		color: var(--fs-dim);
+		font: inherit; font-size: var(--fs-type-xs); line-height: 1.4;
+	}
+	/* a hairline control: the ring lands on the border, not a box-shadow — 10-chrome.css */
+	.fs-search-field:hover { background: var(--fs-panel); color: var(--fs-text); }
+	/* search results panel — the nav dropdown look (same acrylic, hairline, shadow) */
+	.fs-search-panel {
+		position: absolute; inset-inline: auto 0; top: calc(100% + 8px); z-index: var(--fs-z-flyout);
+		width: 320px; max-width: calc(100vw - 32px);
+		margin: 0; padding: var(--fs-space-2);
+		display: none; flex-direction: column; gap: var(--fs-space-0-5);
+		background: color-mix(in srgb, var(--fs-panel) 88%, transparent);
+		-webkit-backdrop-filter: blur(30px) saturate(125%);
+		backdrop-filter: blur(30px) saturate(125%);
+		border: var(--fs-hairline);
+		border-radius: var(--fs-radius-lg); box-shadow: var(--fs-shadow-pop);
+	}
+	.fs-search.open .fs-search-panel { display: flex; animation: fs-fade var(--fs-dur); }
+	.fs-search-panel .fs-search-input {
+		width: 100%; height: var(--fs-ctl-h); padding: 0 var(--fs-space-2-5);
+		border: var(--fs-hairline); border-radius: var(--fs-radius);
+		background: color-mix(in srgb, var(--fs-text) 4%, transparent);
+		color: var(--fs-text); font: inherit; font-size: var(--fs-type);
+	}
+	.fs-search-panel .fs-search-input::placeholder { color: var(--fs-dim); }
+	.fs-search-panel .fs-search-input:focus-visible {
+		outline: none; border-color: var(--fs-accent);
+		box-shadow: var(--fs-focus-ring);
+	}
+	.fs-search-list { display: flex; flex-direction: column; gap: var(--fs-space-0-5); max-height: 320px; overflow-y: auto; margin: 0; padding: 0; list-style: none; }
+	.fs-search-item {
+		display: block; padding: var(--fs-space-2) var(--fs-space-3);
+		border-radius: var(--fs-radius-sm); text-decoration: none;
+	}
+	.fs-search-item .t { display: block; color: var(--fs-text); font-size: var(--fs-type); font-weight: var(--fs-weight-bold); line-height: 1.3; }
+	.fs-search-item .p { display: block; color: var(--fs-dim); font-size: var(--fs-type-xs); line-height: 1.3; margin-top: 1px; }
+	@media (hover: hover) {
+		.fs-search-item:hover { background: color-mix(in srgb, var(--fs-text) 5%, transparent); }
+	}
+	.fs-search-empty { padding: var(--fs-space-3); color: var(--fs-dim); font-size: var(--fs-type); text-align: center; }
+	/* divider between the search field and the user chip */
+	.fs-vr { flex: 0 0 auto; order: 3; width: 1px; height: 22px; margin: 0; border: 0; background: var(--fs-border); }
 	/* .fs-ind-compact then .fs-bar-actrow, both by fitCluster (fs-chrome.js) — chrome.md, "Right
 	 * cluster: two fit steps". max-width releases with the flex basis, or the 30ch cap leaves
 	 * the brand short of the row it was just given. */
@@ -188,27 +252,33 @@
 
 	/* Exactly ONE member of the far-edge cluster may carry an auto inline-start margin, and it must be the
 	 * FIRST one actually rendered. #indicators is earlier in the DOM, so when the poll pill
-	 * shows IT opens the gap and .fs-themerow's auto must stand down — otherwise flexbox
-	 * SPLITS the free space between the two and the pill drifts away from the buttons.
-	 * .fs-themerow keeps its own auto for when the pill is empty and collapsed. */
-	.fs-sidebar #indicators:not(:empty) ~ .fs-themerow { margin-inline-start: 0; }
-	/* …and there are TWO .fs-themerow buttons now (Search, then Appearance), so the same split
-	 * would happen between THEM whenever the pill is collapsed: the second one stands down too. */
-	.fs-themerow ~ .fs-themerow { margin-inline-start: 0; }
+	 * shows IT opens the gap and .fs-search's auto must stand down — otherwise flexbox
+	 * SPLITS the free space between the two and the pill drifts away from the field.
+	 * .fs-search keeps its own auto for when the pill is empty and collapsed. */
+	.fs-sidebar #indicators:not(:empty) ~ .fs-search { margin-inline-start: 0; }
 	.fs-logout {
-		flex: 0 0 auto; order: 2; justify-content: center;
-		width: var(--fs-btn-size); height: var(--fs-btn-size); padding: 0;
-		border: var(--fs-hairline); border-radius: var(--fs-radius);
-		background: transparent;
+		flex: 0 0 auto; order: 3; justify-content: center;
+		display: flex; align-items: center; gap: var(--fs-space-2);
+		height: var(--fs-ctl-h); padding: 0 var(--fs-space-2-5) 0 var(--fs-space-1);
+		border: 0; border-radius: var(--fs-radius-pill);
+		background: transparent; color: var(--fs-text);
 	}
-	/* on a square button the BORDER carries the state — the fill and the ink come from the
-	 * shared hover/active groups in 10-chrome.css */
-	.fs-themerow:hover,
-	.fs-themerow[aria-expanded="true"] { border-color: var(--fs-accent); }
-	.fs-logout:hover { border-color: var(--fs-danger); }
-	.fs-themerow .fs-label, .fs-logout .fs-label { display: none; }
-	.fs-themerow .fs-ico,
-	.fs-logout .fs-ico { width: 18px; height: 18px; flex: 0 0 auto; }
+	/* the user chip: initial-avatar circle + name/role stack + the log-out icon */
+	.fs-avatar {
+		display: inline-flex; align-items: center; justify-content: center;
+		flex: 0 0 auto; width: 26px; height: 26px; border-radius: 999px;
+		background: color-mix(in srgb, var(--fs-accent) 12%, transparent);
+		color: var(--fs-accent); font-size: var(--fs-type-xs); font-weight: var(--fs-weight-bold);
+		text-transform: uppercase; line-height: 1;
+	}
+	.fs-who { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; line-height: 1.2; }
+	.fs-who .fs-name { max-width: 14ch; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: var(--fs-type); font-weight: var(--fs-weight-bold); }
+	.fs-who .fs-role { font-size: var(--fs-type-xs); color: var(--fs-dim); }
+	/* borderless controls: no border to flip, so the open state carries in the ink —
+	 * hover colours stay with the shared groups in 10-chrome.css */
+	.fs-search-field[aria-expanded="true"] { border-color: var(--fs-accent); color: var(--fs-text); }
+	.fs-logout .fs-label { display: none; }
+	.fs-logout .fs-ico { width: 18px; height: 18px; flex: 0 0 auto; color: var(--fs-dim); }
 	.fs-sidebar ul.nav .fs-ico { flex: 0 0 auto; }
 
 	/* The vertical sidebar: the single override, guarded POSITIVELY (never `:not([data-layout=
@@ -280,7 +350,7 @@
 		:root[data-layout="sidebar"]:not([data-narrow]) .fs-sidebar ul.nav > li > a .fs-ico { display: block; }
 		:root[data-layout="sidebar"]:not([data-narrow]) .fs-sidebar ul.nav > li > a .fs-chevron { display: block; }
 		:root[data-layout="sidebar"]:not([data-narrow]) .fs-sidebar ul.nav .fs-ico,
-		:root[data-layout="sidebar"]:not([data-narrow]) .fs-themerow .fs-ico,
+		:root[data-layout="sidebar"]:not([data-narrow]) .fs-search-field .fs-ico,
 		:root[data-layout="sidebar"]:not([data-narrow]) .fs-logout .fs-ico { width: 17px; height: 17px; }
 
 		/* nested submenu -> an inline accordion, not a popup */
@@ -312,25 +382,29 @@
 		:root[data-layout="sidebar"]:not([data-narrow]) .fs-sidebar ul.nav > li.has-sub.open > ul { display: flex; }
 		:root[data-layout="sidebar"]:not([data-narrow]) .fs-sidebar ul.nav ul a { padding: var(--fs-space-2) var(--fs-space-3); }
 
-		/* the Appearance trigger and Log out are full-width text rows down here */
-		:root[data-layout="sidebar"]:not([data-narrow]) .fs-themerow,
+		/* the Search field and Log out are full-width rows down here */
+		:root[data-layout="sidebar"]:not([data-narrow]) .fs-search,
 		:root[data-layout="sidebar"]:not([data-narrow]) .fs-logout {
 			order: 0; margin-inline-start: 0;
 			width: 100%; height: auto;
 			justify-content: normal;
-			gap: var(--fs-space-3); padding: var(--fs-space-2-5) var(--fs-space-3);
-			border: 0; border-radius: var(--fs-radius);
-			background: transparent;
+			gap: var(--fs-space-3);
 		}
-		:root[data-layout="sidebar"]:not([data-narrow]) .fs-themerow { text-align: start; }
-		:root[data-layout="sidebar"]:not([data-narrow]) .fs-logout { font-weight: var(--fs-weight); font-size: var(--fs-type); }
+		:root[data-layout="sidebar"]:not([data-narrow]) .fs-search-field {
+			width: 100%; padding: 0 var(--fs-space-2-5);
+			justify-content: normal; text-align: start;
+		}
+		:root[data-layout="sidebar"]:not([data-narrow]) .fs-search-field .fs-ph { flex: 1 1 auto; }
+		:root[data-layout="sidebar"]:not([data-narrow]) .fs-vr { display: none; }
+		:root[data-layout="sidebar"]:not([data-narrow]) .fs-logout {
+			padding: 0 var(--fs-space-2-5); border-radius: var(--fs-radius);
+			font-weight: var(--fs-weight); font-size: var(--fs-type);
+		}
+		:root[data-layout="sidebar"]:not([data-narrow]) .fs-logout .fs-who { display: none; }
 		:root[data-layout="sidebar"]:not([data-narrow]) .fs-logout:hover { background: var(--fs-panel2); border-color: transparent; }
-		:root[data-layout="sidebar"]:not([data-narrow]) .fs-themerow:hover,
-		:root[data-layout="sidebar"]:not([data-narrow]) .fs-themerow[aria-expanded="true"] { border-color: transparent; }
-		:root[data-layout="sidebar"]:not([data-narrow]) .fs-themerow .fs-label,
 		:root[data-layout="sidebar"]:not([data-narrow]) .fs-logout .fs-label { display: block; flex: 1 1 auto; }
 
-		/* the poll pill sits in the sidebar footer, above Appearance */
+		/* the poll pill sits in the sidebar footer, above Search and Log out */
 		:root[data-layout="sidebar"]:not([data-narrow]) .fs-sidebar #indicators {
 			order: 0; margin-inline-start: 0;
 			flex-wrap: wrap; gap: var(--fs-space-1-5);
@@ -347,8 +421,8 @@
 	}
 
 
-	/* The Appearance controls used to live here (a popover on <body>). They are a PAGE now
-	 * (System -> Appearance): styles/pages/80-appearance.css. */
+	/* The bar carries no flyout of its own — Search anchors its panel to .fs-search
+	 * (position:relative above), so nothing extra is needed here. */
 
 	/* Collapsed sidebar (icon rail): <html data-rail="true">, persisted in localStorage and
 	 * re-applied before paint by head.ut. Labels collapse and a section's submenu becomes a
@@ -373,18 +447,28 @@
 		:root[data-layout="sidebar"]:not([data-narrow])[data-rail="true"] .fs-navlabel,
 		:root[data-layout="sidebar"]:not([data-narrow])[data-rail="true"] .fs-modemenu,
 		:root[data-layout="sidebar"]:not([data-narrow])[data-rail="true"] .fs-sidebar ul.nav > li > a > .fs-label,
-		:root[data-layout="sidebar"]:not([data-narrow])[data-rail="true"] .fs-themerow > .fs-label,
+		:root[data-layout="sidebar"]:not([data-narrow])[data-rail="true"] .fs-search-field > .fs-ph,
+		:root[data-layout="sidebar"]:not([data-narrow])[data-rail="true"] .fs-search-field kbd,
 		:root[data-layout="sidebar"]:not([data-narrow])[data-rail="true"] .fs-logout > .fs-label,
+		:root[data-layout="sidebar"]:not([data-narrow])[data-rail="true"] .fs-vr,
 		/* a rail item has no accordion — its children fly out sideways — so the chevron says
 		 * nothing and crowds the icon. Selector kept this long because the vertical override
 		 * turns the chevron back on at (0,6,3), so a plainer form here would only be (0,6,0). */
 		:root[data-layout="sidebar"]:not([data-narrow])[data-rail="true"] .fs-sidebar ul.nav > li > a .fs-chevron { display: none; }
 
 		:root[data-layout="sidebar"]:not([data-narrow])[data-rail="true"] .fs-sidebar ul.nav > li > a,
-		:root[data-layout="sidebar"]:not([data-narrow])[data-rail="true"] .fs-themerow,
+		:root[data-layout="sidebar"]:not([data-narrow])[data-rail="true"] .fs-search,
 		:root[data-layout="sidebar"]:not([data-narrow])[data-rail="true"] .fs-logout {
 			justify-content: center; gap: 0; padding: var(--fs-space-2-5) 0;
 		}
+		/* rail: the field collapses to a square icon trigger, the chip to the avatar alone */
+		:root[data-layout="sidebar"]:not([data-narrow])[data-rail="true"] .fs-search-field {
+			width: var(--fs-ctl-h); padding: 0; justify-content: center;
+		}
+		:root[data-layout="sidebar"]:not([data-narrow])[data-rail="true"] .fs-logout {
+			width: var(--fs-ctl-h); height: var(--fs-ctl-h); padding: 0;
+		}
+		:root[data-layout="sidebar"]:not([data-narrow])[data-rail="true"] .fs-logout .fs-who { display: none; }
 
 		/* leaf sections have no flyout — show their name as a tooltip bubble */
 		:root[data-layout="sidebar"]:not([data-narrow])[data-rail="true"] .fs-sidebar ul.nav > li:not(.has-sub) > a::after {
@@ -481,7 +565,8 @@
 	}
 	.fs-sidebar #indicators:empty { display: none; }
 	.fs-indicators { flex-wrap: wrap; }
-	.fs-content { padding: var(--fs-space-5) var(--fs-content-pad); flex: 1 1 auto; width: 100%; max-width: var(--fs-content-max); margin: 0 auto; }
+	/* Fluent mock: 30px top / 64px gutters / 40px bottom, full-bleed to --fs-content-max: none */
+	.fs-content { padding: calc(var(--fs-space-7) + var(--fs-space-0-5)) var(--fs-content-pad) var(--fs-space-10); flex: 1 1 auto; width: 100%; max-width: var(--fs-content-max); margin: 0 auto; }
 
 	/* fs-router.js builds the incoming page in a second #view here, then moves its children into
 	 * the live one, so the visible page is never emptied while the next one loads. `visibility:
@@ -539,7 +624,6 @@
 	.fs-main > .alert-message {
 		order: 1; margin: var(--fs-space-4) auto 0;
 		width: calc(100% - var(--fs-content-pad) * 2);
-		max-width: calc(var(--fs-content-max) - var(--fs-content-pad) * 2);
 	}
 	.fs-main > .fs-content { order: 2; }
 	.fs-main > .fs-footer { order: 3; }
@@ -576,7 +660,7 @@
 		/* the bar's control surface — ui.js emits a bare `<span data-indicator=…>` with NO
 		 * class, so a `.label`-keyed rule matches nothing */
 		background: transparent;
-		border: var(--fs-hairline);
+		border: 0;
 		color: var(--fs-dim);
 		border-radius: var(--fs-radius); padding: 0 var(--fs-space-3); box-shadow: none;
 	}

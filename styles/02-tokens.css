@@ -3,22 +3,28 @@
 	 * docs/design-system.md "Two tiers, and the split is load-bearing". */
 	:root {
 		/* palette colours live in 03-palettes.css */
-		--fs-shadow-pop: 0 12px 34px rgba(0,0,0,.30);	/* pop surfaces: menus, dropdown lists, the select picker */
+		/* Fluent elevation: s2 rest / s-hover lifted / s8 pop (docs: fluent.css) */
+		--fs-shadow-card: 0 1.6px 3.6px rgba(0,0,0,.13), 0 .3px .9px rgba(0,0,0,.10);
+		--fs-shadow-hover: 0 6.4px 14.4px rgba(0,0,0,.18), 0 1.2px 3.6px rgba(0,0,0,.14);
+		--fs-shadow-pop: 0 6.4px 14.4px rgba(0,0,0,.13), 0 1.2px 3.6px rgba(0,0,0,.10);	/* pop surfaces: menus, dropdown lists, the select picker */
 		/* which of the three a control takes: docs/design-system.md "The derived ladder" */
-		--fs-focus-ring: 0 0 0 3px var(--fs-accent-soft);
-		--fs-focus-ring-solo: 0 0 0 2px var(--fs-panel), 0 0 0 5px var(--fs-accent);
+		--fs-focus-ring: 0 0 0 3px color-mix(in srgb, var(--fs-accent) 18%, transparent);
+		--fs-focus-ring-solo: 0 0 0 2px var(--fs-panel), 0 0 0 4px var(--fs-accent);
 		--fs-focus-ring-invalid: 0 0 0 3px var(--fs-danger-fill);
 		/* opaque, not a tint (4.21:1 in dark); pinned by tools/mirror.mjs
 		 * (`selected-row/paint`), docs/css.md "@mirror" */
 		--fs-row-rail: inset 2px 0 0 var(--fs-accent);
+		/* Fluent table row hover: a whisper of accent, not a grey step */
+		--fs-row-hover: color-mix(in srgb, var(--fs-accent) 6%, transparent);
 
 		/* every separator is this one line, stated once rather than in 69 longhand declarations */
 		--fs-hairline: 1px solid var(--fs-border);
 		/* ring and border-colour transition together, or the ring arrives before the edge does */
-		--fs-field-transition: border-color var(--fs-dur), box-shadow var(--fs-dur);
+		--fs-field-transition: border-color var(--fs-dur), box-shadow var(--fs-dur), transform var(--fs-dur-move);
 
-		/* the theme's one colour literal on purpose. docs/design-system.md "The derived ladder". */
-		--fs-scrim: rgba(0, 0, 0, .7);
+		/* the theme's one colour literal on purpose. docs/design-system.md "The derived ladder".
+		 * Fluent light pages overlay at 40%, not 70%. */
+		--fs-scrim: rgba(0, 0, 0, .4);
 
 		/* Role tint ladder, derived so it follows the palette. docs/design-system.md "The derived
 		 * ladder". */
@@ -47,35 +53,36 @@
 		/* direction flips by mode: light darkens, dark brightens (`filter` recolours the ink too) */
 		--fs-hover-lift: brightness(.90);
 
-		/* four durations, no easing token. docs/design-system.md "Scales" ("Motion") */
+		/* four durations + one Fluent ease. docs/design-system.md "Scales" ("Motion") */
+		--fs-ease: cubic-bezier(.33, 0, .15, 1);	/* the mock's standard ease */
 		--fs-dur: .15s;		/* a state change: colour, border, shadow, background, filter */
 		--fs-dur-move: .2s;	/* something that moves or unfolds: transform, max-height */
 		--fs-dur-fade: .25s;	/* a transient thing fading in or out: spinner, notification */
 		--fs-dur-fill: .4s;	/* a progress bar growing to its value */
-		--fs-content-max: 1280px;	/* content column cap */
-		/* also read by the bar's centering calc and the notification-width calc */
-		--fs-content-pad: calc(28px * var(--fs-density-space));
+		--fs-content-max: none;	/* the Fluent mock runs full width at 1920 — no column cap */
+		/* also read by the notification-width calc */
+		--fs-content-pad: calc(64px * var(--fs-density-space));
 		/* tokens, not literals — fs-chrome.js's fitShell() reads them back. docs/design-system.md
 		 * "Scales" ("Shell geometry"). */
 		--fs-sidebar-w: calc(224px * var(--fs-density-box));		/* the expanded vertical sidebar's column */
 		--fs-rail-w: calc(68px * var(--fs-density-box));		/* ...and the same sidebar collapsed to its icon rail */
 		--fs-content-min: 500px;	/* below this a content column stops being readable */
 		/* opaque on purpose. docs/design-system.md "The derived ladder". */
-		--fs-bar-bg: var(--fs-panel);
+		--fs-bar-bg: rgba(255, 255, 255, .78);	/* acrylic over the page, paired with blur in theme/20-shell.css */
 		/* base/10-reset.css's scroll-margin must equal this or an in-page jump lands under the bar */
 		/* drawn, not fetched. docs/design-system.md "Two glyphs drawn as tokens, not fetched". */
 		--fs-select-chevron:
 			linear-gradient(-45deg, transparent 45%, var(--fs-dim) 45% 55%, transparent 55%),
 			linear-gradient(45deg, transparent 45%, var(--fs-dim) 45% 55%, transparent 55%);
-		--fs-bar-h: calc(46px * var(--fs-density-box));
-		/* logo box, .fs-themerow controls, Log out and the poll pill share this size */
-		--fs-btn-size: calc(34px * var(--fs-density-box));
+		--fs-bar-h: calc(64px * var(--fs-density-box));
+		/* logo box, the search field, Log out and the poll pill share this size */
+		--fs-btn-size: calc(38px * var(--fs-density-box));
 
 		/* one base (Appearance -> Rounding); three radii scale from it */
-		--fs-radius-base: 12px;
+		--fs-radius-base: 8px;
 		--fs-radius-lg: var(--fs-radius-base);				/* cards, panels, modals, table frame, popovers */
-		--fs-radius: calc(var(--fs-radius-base) * 5 / 6);	/* controls: inputs, buttons, dropdowns, tabs (10 @12) */
-		--fs-radius-sm: calc(var(--fs-radius-base) * 2 / 3);	/* chips, code, small insets, rail toggle (8 @12) */
+		--fs-radius: calc(var(--fs-radius-base) * 3 / 4);	/* controls: inputs, buttons, dropdowns, tabs (6 @8) */
+		--fs-radius-sm: calc(var(--fs-radius-base) * 1 / 2);	/* chips, code, small insets, rail toggle (4 @8) */
 		--fs-radius-pill: 999px;					/* pills, toggles, badges — always round */
 
 		/* .cbi-section's own gutter; theme/45-misc.css reads it back to undo it (bleed to the card edge) */
@@ -83,8 +90,8 @@
 		/* vertical rhythm between cards: .cbi-section, tab groups, alerts, action bars */
 		--fs-card-gap: calc(16px * var(--fs-density-space));
 
-		--fs-font-sans: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-		--fs-font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+		--fs-font-sans: "Segoe UI Variable Text", "Segoe UI", -apple-system, "Microsoft YaHei UI", "PingFang SC", system-ui, sans-serif;
+		--fs-font-mono: "Cascadia Code", "Cascadia Mono", Consolas, ui-monospace, monospace;
 
 		/* five steps, ~1.25 apart */
 		/* three multipliers, one knob each for text/air/boxes */
@@ -100,7 +107,7 @@
 		/* rounded in @supports below (round() is younger than the floor) */
 		--fs-type-2xs: calc(10px * var(--fs-density-type));
 		--fs-type-xs: calc(11px * var(--fs-density-type));	/* eyebrow, badges, tooltips, dense metadata */
-		--fs-type: calc(13px * var(--fs-density-type));		/* body, tables, fields, menu items — the base */
+		--fs-type: calc(14px * var(--fs-density-type));		/* body, tables, fields, menu items — the base */
 		--fs-type-lg: calc(16px * var(--fs-density-type));	/* section titles (h3/legend), alert headings */
 		--fs-type-xl: calc(20px * var(--fs-density-type));	/* page titles */
 		--fs-type-2xl: calc(26px * var(--fs-density-type));	/* h1 — only a third-party app emits a bare one */
@@ -133,8 +140,8 @@
 		--fs-space-8: calc(32px * var(--fs-density-space));
 		--fs-space-10: calc(40px * var(--fs-density-space));
 
-		/* every single-line field's height, derived not measured */
-		--fs-control-h: calc(var(--fs-type) * var(--fs-leading) + var(--fs-space-1) * 2 + 2px);
+		/* every single-line field's height — the Fluent field box, 40px */
+		--fs-control-h: calc(40px * var(--fs-density-box));
 
 		/* ceiling for an elastic `.cbi-value-field` (flex: 1) — a COLUMN width, off the 4px scale */
 		--fs-field-max: 440px;
@@ -196,11 +203,11 @@
 		:root {
 			--fs-type-2xs: calc(round(10px * var(--fs-density-type), 1px));
 			--fs-type-xs: calc(round(11px * var(--fs-density-type), 1px));
-			--fs-type: calc(round(13px * var(--fs-density-type), 1px));
+			--fs-type: calc(round(14px * var(--fs-density-type), 1px));
 			--fs-type-lg: calc(round(16px * var(--fs-density-type), 1px));
 			--fs-type-xl: calc(round(20px * var(--fs-density-type), 1px));
 			--fs-type-2xl: calc(round(26px * var(--fs-density-type), 1px));
-			--fs-control-h: calc(round(up, calc(var(--fs-type) * var(--fs-leading) + var(--fs-space-1) * 2 + 2px), 4px));
+			--fs-control-h: calc(round(up, calc(40px * var(--fs-density-box)), 4px));
 		}
 	}
 

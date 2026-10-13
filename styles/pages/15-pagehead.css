@@ -1,0 +1,87 @@
+@layer page {
+	/* The Fluent page head injected by menu-basalt.js: breadcrumb over a
+	 * large title, the stock .cbi-page-actions migrated to the right
+	 * edge. The head mounts before #tabmenu so the DOM reads head →
+	 * tabs → alerts → content. */
+
+	.fs-pghead {
+		display: flex;
+		align-items: flex-end;
+		justify-content: space-between;
+		flex-wrap: wrap;
+		gap: var(--fs-space-4);
+		margin: 0 0 var(--fs-space-5);
+	}
+	.fs-pghead-main { min-width: 0; }
+
+	/* "Network › Interfaces" — decorative: the sr-only .fs-title carries
+	 * the real heading, the crumbs are wayfinding only */
+	.fs-crumbs {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		margin: 0 0 6px;
+		font-size: var(--fs-type-xs);
+		color: var(--fs-faint);
+	}
+	.fs-crumbs span + span::before {
+		content: "›";
+		margin-inline-end: 8px;
+	}
+
+	.fs-pg-title {
+		font-size: var(--fs-type-2xl);
+		font-weight: var(--fs-weight);
+		line-height: var(--fs-leading-tight);
+		letter-spacing: -0.01em;
+		color: var(--fs-text);
+	}
+
+	/* the migrated stock bar; guard mirrors this (unlayered always wins) */
+	.fs-pg-actions { display: flex; align-items: center; gap: 10px; }
+	.fs-pg-actions .cbi-page-actions { padding: 0; margin: 0; }
+
+	/* card head for sectioned pages (interfaces list): a full-bleed
+	 * strip riding the card's own padding; mirror of .fs-ovl-head in
+	 * styles/pages/20-overview.css — keep the two in sync */
+	.fs-card-head {
+		display: flex;
+		align-items: center;
+		gap: var(--fs-space-2);
+		margin: calc(var(--fs-card-pad) * -1) calc(var(--fs-card-pad) * -1) var(--fs-space-3);
+		padding: var(--fs-space-3) var(--fs-card-pad);
+		border-bottom: var(--fs-hairline);
+	}
+	.fs-card-ico {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 32px;
+		height: 32px;
+		flex: 0 0 auto;
+		border-radius: var(--fs-radius-sm);
+		background: var(--fs-accent-fill);
+		color: var(--fs-accent);
+	}
+	.fs-card-ico .fs-ico { width: 18px; height: 18px; }
+	.fs-card-title {
+		margin: 0;
+		font-size: var(--fs-type-lg);
+		font-weight: var(--fs-weight);
+		line-height: var(--fs-leading-tight);
+		flex: 1 1 auto;
+		min-width: 0;
+	}
+	.fs-card-more { margin-inline-start: auto; }
+	.fs-card-head .cbi-button { min-height: var(--fs-ctl-h-sm); }
+
+	/* narrow: the actions bar drops under the title. A media query, not
+	 * @container: the containers (45-misc.css) sit on #view/.cbi-map —
+	 * siblings of the head, so a container query here never matches. */
+	@media (max-width: 600px) {
+		.fs-pghead {
+			align-items: stretch;
+			flex-direction: column;
+		}
+	}
+}

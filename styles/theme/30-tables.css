@@ -4,6 +4,7 @@
 		background: var(--fs-panel);
 		border: var(--fs-hairline);
 		border-radius: var(--fs-radius-lg);
+		box-shadow: var(--fs-shadow-card);
 	}
 	.cbi-section { padding: var(--fs-card-pad); margin-bottom: var(--fs-card-gap); }
 	/* bare <legend> only; ink from the heading ramp. No line-height — base already sets 1. */
@@ -75,9 +76,11 @@
 
 	/* --- DATA tables ([id] or JS-tagged .fs-dt) --- `:is()` at ONE specificity: split, a table
 	 * known only by the tag (Status -> Routing) lost to key/value's default. */
+	/* Fluent mock: 12px block / 18px inline for BOTH header and data cells (th 11px rounded to the
+	 * shared padding, within a 1.5px tolerance) */
 	.cbi-section .table:is([id], .fs-dt) .td,
 	.cbi-section .table:is([id], .fs-dt) .th,
-	table.fs-dt .td, table.fs-dt .th { padding: var(--fs-space-2-5) var(--fs-space-3); }
+	table.fs-dt .td, table.fs-dt .th { padding: var(--fs-space-3) calc(var(--fs-space-4) + var(--fs-space-0-5)); }
 	.cbi-section .table:is([id], .fs-dt) .td { font-family: var(--fs-font-mono); font-size: var(--fs-type); color: var(--fs-text); }
 
 	/* the min-content FLOOR belongs here: break-word (unlike base's -anywhere) does not lower
@@ -114,7 +117,8 @@
 	 * (18 jumps/1500 frames measured) — anchoring.md, "What the engine is told". */
 	.table.fs-dt { overflow-anchor: none; }
 
-	.cbi-section .table:is([id], .fs-dt) .tr:not(.table-titles):not(.placeholder):hover .td { background: var(--fs-panel2); }
+	/* Fluent mock row hover: a 6% accent wash, not a grey step */
+	.cbi-section .table:is([id], .fs-dt) .tr:not(.table-titles):not(.placeholder):hover .td { background: var(--fs-row-hover); }
 	.cbi-section .table:is([id], .fs-dt) .tr.table-titles .th { border-bottom-color: var(--fs-border); }
 	/* contour (border-collapse:separate, or the radius is silently dropped); #view too —
 	 * Startup renders .table.fs-dt with no section */
@@ -159,6 +163,13 @@
 	}
 	.cbi-section .table:not([id]):not(.cbi-section-table):not(.fs-dt):not(:has(.th)):not(:has(.td:nth-child(3))):not([style*="table-layout"]) .td:last-child:not(:first-child) {
 		font-family: var(--fs-font-mono); color: var(--fs-text); text-align: end;
+	}
+	/* re-pin the key/value row edge to the hairline: the row-line rule below out-specifies the
+	 * generic `.cbi-section .table .td` default and would silently lighten it. :not(:last-child)
+	 * keeps the flush last row — this rule out-specifies that reset too, so excluding here is the
+	 * only way both can hold. */
+	.cbi-section .table:not([id]):not(.cbi-section-table):not(.fs-dt):not(:has(.th)):not(:has(.td:nth-child(3))):not([style*="table-layout"]) .tr:not(:last-child) > .td {
+		border-bottom: var(--fs-hairline);
 	}
 	/* below ~560px the 40%/nowrap column starves the value — stacked below (560, not the config
 	 * table's 960px). :first-child:first-child doubles the pseudo-class ON PURPOSE, to outrank. */
@@ -253,19 +264,23 @@
 	.table .tr.table-titles > .th,
 	.table .tr.cbi-section-table-titles > .th,
 	.table .tr.cbi-section-table-titles::before { border-bottom: var(--fs-hairline); }
-	.table .tr:not(.table-titles):not(.cbi-section-table-titles):not(:last-child) > .td,
+	/* Fluent mock: data separators are the faint row line, one step lighter than the frame's
+	 * hairline; the row-name ::before keeps the hairline (it doubles as an edge on 24.10) */
+	.table .tr:not(.table-titles):not(.cbi-section-table-titles):not(:last-child) > .td { border-bottom: 1px solid var(--fs-row-line); }
 	.table .tr.cbi-section-table-row:not(:last-child)::before { border-bottom: var(--fs-hairline); }
 	/* per-CELL border, so a foreign `position: relative; top:` (dashboard) drags one cell's
 	 * border out of line — `top` AND `bottom` cancels either without touching `relative` itself */
 	:is(#view, #modal_overlay) .fs-dt .td { top: auto; bottom: auto; }
-	/* descendant combinator so a real <table>'s inserted <tbody> is covered too */
+	/* descendant combinator so a real <table>'s inserted <tbody> is covered too. Fluent mock:
+	 * the header band is a faint panel step, not transparent */
 	.table .tr.table-titles, .table .tr.cbi-section-table-titles {
-		background: transparent;	/* drop the base panel2 header bar — match the dashboard's faint-label + underline look */
+		background: var(--fs-panel2);
 	}
 	.table .tr.table-titles .th, .table .tr.cbi-section-table-titles .th,
 	.table .tr.cbi-section-table-titles::before {
-		color: var(--fs-eyebrow-color); font-size: var(--fs-type-xs); font-weight: var(--fs-eyebrow-weight);
-		letter-spacing: var(--fs-eyebrow-tracking);
+		/* Fluent mock th: normal-case 12px/600 label in the secondary ink, no tracking, no face of its own — the row above paints the band */
+		color: var(--fs-dim); font-size: var(--fs-type-xs); font-weight: var(--fs-eyebrow-weight);
+		letter-spacing: 0;
 		background: transparent;
 	}
 	/* row NAME reads the same on both releases (real cell / ::before) — a LABEL, sans face */
@@ -278,7 +293,8 @@
 	}
 	/* row hover ONLY on real data/config tables (an untagged plain .table lit its whole block,
 	 * issue #5.3; a placeholder row lit up too, issue #5.2/#15) */
-	.table.cbi-section-table .tr.cbi-section-table-row:not(.placeholder):hover { background: var(--fs-panel2); }
+	/* Fluent mock row hover: a 6% accent wash, not a grey step */
+	.table.cbi-section-table .tr.cbi-section-table-row:not(.placeholder):hover { background: var(--fs-row-hover); }
 	/* keep section/modal tables flush (no forced hover-card look) */
 	.cbi-section .table > .tr, .cbi-modal .table > .tr { border-radius: 0; }
 

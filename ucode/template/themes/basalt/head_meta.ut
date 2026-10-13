@@ -6,8 +6,8 @@
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 
-<!-- Dark chrome: this theme is dark-only -->
-<meta name="theme-color" content="#1c2128">
+<!-- Light chrome: this theme is Fluent light -->
+<meta name="theme-color" content="#f3f2f1">
 <meta name="darkreader-lock">
 
 <!-- PWA / icons -->

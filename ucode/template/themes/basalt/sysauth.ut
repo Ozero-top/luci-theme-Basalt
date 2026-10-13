@@ -1,7 +1,7 @@
 {#
 	luci-theme-Basalt v2
 
-	Login page: dark centered card (.fs-login, styles/pages/10-login.css),
+	Login page: light acrylic Fluent card (.fs-login, styles/pages/10-login.css),
 	vendored markup from luci-theme-footstrap (Apache-2.0). Renders through
 	header.ut/footer.ut with blank_page=true, so no shell chrome surrounds
 	the form. The server renders the form itself: the view layer boots
@@ -20,7 +20,10 @@
 {% include('header', { blank_page: true }) %}
 
 <form method="post" class="fs-login">
-	<p class="fs-login-host">{{ entityencode(striptags(boardinfo.hostname ?? 'OpenWrt'), true) }}</p>
+	<p class="fs-login-host">
+		<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--fs-accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v.01M12 11v5"/></svg>
+		{{ entityencode(striptags(boardinfo.hostname ?? 'OpenWrt'), true) }}
+	</p>
 
 	{% if (fuser && !auth_plugin): %}
 	<div class="alert-message error">
@@ -33,7 +36,17 @@
 	</div>
 	{% endif %}
 
+	<div class="fs-login-card">
 	<div class="cbi-map">
+		<p class="fs-login-logo">
+			<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+				<rect x="4" y="13" width="16" height="6.5" rx="1.5"/>
+				<path d="M7 16.2h4"/>
+				<path d="M8 9.5a5.5 5.5 0 0 1 8 0"/>
+				<path d="M10.3 11.8a2.6 2.6 0 0 1 3.4 0"/>
+				<path d="M16.5 13V9.2M7.5 13V9.2"/>
+			</svg>
+		</p>
 		<h1 name="content">{{ _('Authorization Required') }}</h1>
 		<div class="cbi-map-descr">
 			{{ _('Please enter your username and password.') }}
@@ -87,6 +100,13 @@
 	<div class="cbi-page-actions">
 		<input type="submit" value="{{ _('Log in') }}" class="btn cbi-button cbi-button-apply" />
 	</div>
+	</div>{# /fs-login-card #}
+
+	<p class="fs-login-foot">
+		{% if (version): %}
+		{{ _('Powered by') }} <b>{{ version.luciname }}</b> · {{ version.distname }} {{ version.distversion }}
+		{% endif %}
+	</p>
 </form>
 
 {% include('footer', { blank_page: true }) %}

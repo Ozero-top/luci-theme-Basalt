@@ -1,72 +1,195 @@
 @layer page {
-	/* LOGIN — themes/footstrap/sysauth.ut's own template, centred card, no chrome. Scoped by
-	 * `.fs-login`, a class the template puts on the form: replaced
+	/* LOGIN — themes/footstrap/sysauth.ut's own template, redrawn from the Fluent mock:
+	 * preview/fluent/src/01-login.html + fluent.css "登录页" (715-803). Three acrylic layers on
+	 * one fixed wash: the hostname tip, the card, and the grid/sweep the body paints itself.
+	 * Scoped by `.fs-login`, a class the template puts on the form: replaced
 	 * `form:has(> .cbi-map input[name="luci_username"])`, 49 chars × 17 rules (~0.8 KB) matching
 	 * nothing else. Never turn this into a JS-revealed modal: the view runs pre-session, RPCs answer
-	 * "Access denied", render() never runs. docs/css.md "Login: a definite width, not max-width". */
-	/* keeps a gap when the card is taller than the viewport and auto margins collapse to 0 */
-	body:has(> .fs-login) { padding: var(--fs-space-4); }
-	.fs-login {
-		/* DEFINITE width, never max-width: a direct flex item of <body> collapses to min-content
-		 * (~131px) under max-width alone — docs/css.md above. */
-		width: min(400px, calc(100% - 32px));
-		/* body is a min-height:100% flex column: auto margins centre the card
-		 * on BOTH axes (the old 7vh top margin left it riding high on wide screens) */
-		margin: auto;
-		background: var(--fs-panel); border: var(--fs-hairline); border-radius: var(--fs-radius-lg);
-		/* the token, not a literal 45%-black 60px halo: that ignored the palette. */
-		padding: var(--fs-space-6) var(--fs-space-6) var(--fs-space-6); box-shadow: var(--fs-shadow-pop);
+	 * "Access denied", render() never runs. docs/css.md "Login: a definite width, not max-width".
+	 * The page runs PRE-session, so the whole body.logged-in guard is inert here — no unlayered
+	 * mirror to fight, every override below only races base. */
+
+	/* the mock's .login-bg, painted by the body (its pseudo-elements are free — 15-wallpaper.css
+	 * claims only :root and .fs-pattern; the opaque gradients here cover both). Fixed attachment:
+	 * the wash stays viewport-locked, exactly the mock's absolute full-bleed layer. */
+	body:has(> form.fs-login) {
+		padding: var(--fs-space-4);	/* a gap when the card is taller than the viewport */
+		background:
+			radial-gradient(1200px 760px at 12% -10%, #c7e0f4 0%, transparent 55%),
+			radial-gradient(1000px 700px at 88% 108%, #deecf9 0%, transparent 58%),
+			radial-gradient(720px 520px at 74% 12%, rgba(255, 255, 255, .95) 0%, transparent 55%),
+			linear-gradient(158deg, #e8f1fa 0%, #eef3f9 48%, #e6eef7 100%);
+		background-attachment: fixed;
 	}
-	/* router hostname, not the eyebrow tokens: those force uppercase and a hostname is a name
-	 * (case is the only thing telling two similar ones apart). docs/css.md above. */
+	/* the mock's .login-grid, on ::before. z-index:0 + the raised form below: a fixed
+	 * pseudo-element paints with positioned content, so an unpositioned form would slide UNDER it. */
+	body:has(> form.fs-login)::before {
+		content: "";
+		position: fixed; inset: 0; z-index: 0;
+		pointer-events: none;
+		background-image:
+			linear-gradient(rgba(0, 90, 158, .045) 1px, transparent 1px),
+			linear-gradient(90deg, rgba(0, 90, 158, .045) 1px, transparent 1px);
+		background-size: 64px 64px;
+		-webkit-mask-image: radial-gradient(1200px 800px at 50% 42%, #000 30%, transparent 78%);
+		mask-image: radial-gradient(1200px 800px at 50% 42%, #000 30%, transparent 78%);
+	}
+	/* the mock's .login-bg::after sweep light, on ::after — static, exactly as drawn */
+	body:has(> form.fs-login)::after {
+		content: "";
+		position: fixed; inset: -20%; z-index: 0;
+		pointer-events: none;
+		background: linear-gradient(115deg, transparent 42%, rgba(255, 255, 255, .55) 50%, transparent 58%);
+	}
+
+	/* the form is the mock's .login-wrap: a centred column holding the tip and the card.
+	 * DEFINITE width, never max-width: a direct flex item of <body> collapses to min-content
+	 * (~131px) under max-width alone — docs/css.md above. */
+	form.fs-login {
+		position: relative; z-index: 1;
+		display: flex; flex-direction: column; align-items: center;
+		gap: 26px;	/* the mock's .login-wrap gap between tip and card */
+		width: min(480px, calc(100% - 32px));
+		margin: auto;
+	}
+	/* a plugin's alert plate spans the column, never shrinks to its text */
+	.fs-login > .alert-message { width: 100%; margin: 0; border-radius: var(--fs-radius); }
+
+	/* the mock's .login-foot: one muted line under the card, b holds the product name */
+	.fs-login-foot {
+		display: flex; align-items: center; gap: 8px;
+		margin: 0;
+		font-size: 12px; color: var(--fs-faint);
+	}
+	.fs-login-foot b { color: var(--fs-dim); font-weight: var(--fs-weight); }
+
+	/* the hostname, restyled as the mock's .login-tip: a small acrylic pill floating above the
+	 * card. Not the eyebrow tokens: a hostname is a name (case is the only thing telling two
+	 * similar ones apart). docs/css.md above. */
 	.fs-login-host {
-		margin: 0 0 var(--fs-space-6); text-align: center;
-		font-size: var(--fs-type-lg); font-weight: var(--fs-weight-bold); color: var(--fs-dim);
+		display: inline-flex; align-items: center; gap: 8px;
+		max-width: 100%; box-sizing: border-box;
+		margin: 0; padding: 8px 16px;
+		background: rgba(255, 255, 255, .6);
+		-webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+		border: 1px solid rgba(255, 255, 255, .65);
+		border-radius: var(--fs-radius-pill);
+		box-shadow: var(--fs-shadow-card);	/* the mock's --s2 */
+		font-size: 12px; color: var(--fs-dim);
 		overflow-wrap: anywhere;
 	}
+
+	/* the mock's .login-card: 480px acrylic, 44/44/36, the pop shadow. Lives on the wrapper
+	 * sysauth.ut adds around the cbi-map + actions — the form itself is the wrap column. */
+	.fs-login-card {
+		width: 100%; box-sizing: border-box;
+		padding: 44px 44px 36px;
+		background: rgba(255, 255, 255, .7);
+		-webkit-backdrop-filter: blur(30px) saturate(140%); backdrop-filter: blur(30px) saturate(140%);
+		border: 1px solid rgba(255, 255, 255, .6);
+		border-radius: var(--fs-radius-lg);
+		box-shadow: var(--fs-shadow-pop);	/* the mock's --s8 */
+	}
+	/* strip the cbi frames: the card IS the panel; a second frame here would nest one inside it */
 	.fs-login .cbi-map,
 	.fs-login .cbi-section,
 	.fs-login .cbi-section-node {
 		background: none; border: 0; padding: 0; margin: 0; box-shadow: none;
 	}
-	/* the login card IS the panel; a second frame here would nest one inside it */
+	/* the head is the mock's .login-head: logo, title, descr, all centred */
+	.fs-login .cbi-map {
+		display: flex; flex-direction: column; align-items: center; text-align: center;
+	}
 	.fs-login .cbi-map > h1,
 	.fs-login .cbi-map-descr {
 		background: none; border: 0; border-radius: 0; box-shadow: none; padding: 0;
 	}
-	/* h1, not h2: no title bar on this page to carry the document's h1, so sysauth.ut emits it here
-	 * and the ramp's own h1 size wraps at 400px — reset to h2's size. docs/css.md above. */
+	/* the mock's .login-logo: a 64px rounded tile on the blue ramp, a 34px router glyph.
+	 * The markup lands in sysauth.ut; until then this rule simply never matches. */
+	.fs-login-logo {
+		display: grid; place-items: center;
+		width: 64px; height: 64px;
+		margin: 0 0 16px;
+		border-radius: 16px;
+		/* the mock's ramp verbatim: #2b95e0 -> --blue 58% -> --blue-active; no tokens at those steps */
+		background: linear-gradient(160deg, #2b95e0 0%, var(--fs-accent) 58%, #005a9e 100%);
+		color: var(--fs-on-accent);
+		/* the mock's --s4 — a half-step between card and hover the token ladder skips */
+		box-shadow: 0 3.2px 7.2px rgba(0, 0, 0, .13), 0 .6px 1.8px rgba(0, 0, 0, .10);
+	}
+	.fs-login-logo svg { width: 34px; height: 34px; }
+	/* h1, not h2: no title bar on this page to carry the document's h1, so sysauth.ut emits it here.
+	 * The mock's .login-title: 22px/600, -.01em. */
 	.fs-login .cbi-map > h1 {
-		font-size: var(--fs-type-xl); font-weight: var(--fs-weight-bold); letter-spacing: -.01em; margin: 0 0 var(--fs-space-1-5);
+		font-size: 22px; font-weight: var(--fs-weight); letter-spacing: -.01em;
+		margin: 0; color: var(--fs-text);
 	}
-	.fs-login .cbi-map-descr { color: var(--fs-dim); font-size: var(--fs-type); margin: 0 0 var(--fs-space-5); }
-	/* label and its control share ONE row: fixed-width title, fluid field */
+	/* the mock's .login-desc: 13px secondary ink, 5px under the title, 26px above the form
+	 * (the .login-head margin-bottom) */
+	.fs-login .cbi-map-descr { font-size: 13px; color: var(--fs-dim); margin: 5px 0 0; }
+	.fs-login .cbi-map .cbi-section { width: 100%; margin-top: 26px; }
+
+	/* fields STACK, label above its control — the mock's .field, 16px between fields */
+	.fs-login .cbi-section-node { display: flex; flex-direction: column; gap: 16px; }
 	.fs-login .cbi-value {
-		display: flex; align-items: center; gap: var(--fs-space-4);
-		border: 0; padding: 0 0 var(--fs-space-4); margin: 0;
+		display: flex; flex-direction: column; align-items: stretch; gap: 6px;
+		border: 0; padding: 0; margin: 0;
 	}
+	/* the mock's .field > label: 13px/600, normal case, full ink — not the eyebrow idiom */
 	.fs-login .cbi-value-title {
-		flex: 0 0 4.5em; width: auto; max-width: none; padding: 0; text-align: start;
-		font-size: var(--fs-type-xs); font-weight: var(--fs-eyebrow-weight); letter-spacing: var(--fs-eyebrow-tracking); text-transform: uppercase; color: var(--fs-eyebrow-color);
+		width: auto; max-width: none; padding: 0; text-align: start;
+		font-size: 13px; font-weight: var(--fs-weight); letter-spacing: 0; text-transform: none;
+		color: var(--fs-text);
 	}
 	.fs-login .cbi-value-field {
-		flex: 1 1 auto; min-width: 0; width: auto; margin: 0; padding: 0;
+		flex: none; width: 100%; margin: 0; padding: 0;
 	}
 	.fs-login .cbi-value-field input {
 		width: 100%; margin: 0; box-sizing: border-box;
+		height: var(--fs-control-h);	/* the mock's 40px field box */
 	}
-	.fs-login .alert-message { margin: 0 0 var(--fs-space-3-5); border-radius: var(--fs-radius); }
-	/* column, not block: an auth plugin's second action (Reset) glues to Login under margin:0 */
+	/* the mock's .hint, when an auth plugin ships one */
+	.fs-login .cbi-value-description { margin: 0; font-size: 11.5px; color: var(--fs-faint); }
+
+	/* the mock's .login-btn (btn-primary btn-lg): full width, 44px, the accent fill.
+	 * column, not block: an auth plugin's second action (Reset) glues to Login under margin:0 */
 	.fs-login .cbi-page-actions {
 		display: flex; flex-direction: column; gap: var(--fs-space-2-5);
 		background: none; border: 0;
-		padding: 0; margin: var(--fs-space-1-5) 0 0; text-align: start;
+		padding: 0; margin: 16px 0 0; text-align: start;
+		width: 100%;
 	}
 	.fs-login .cbi-page-actions .btn,
 	.fs-login .cbi-page-actions input[type="submit"] {
-		width: 100%; box-sizing: border-box; min-height: var(--fs-ctl-h-lg); margin: 0; border-radius: var(--fs-radius-lg);
+		width: 100%; box-sizing: border-box; min-height: var(--fs-ctl-h-lg); margin: 0;
+		border-radius: var(--fs-radius);
 		background: var(--fs-accent); color: var(--fs-on-accent);
-		border: 0; font-weight: var(--fs-weight-bold); font-size: var(--fs-type-lg);
+		border: 0; font-weight: var(--fs-weight); font-size: 14.5px;
+		box-shadow: var(--fs-shadow-card);	/* the mock's --s2 on .btn */
+		transition: background-color var(--fs-dur), transform var(--fs-dur-move), box-shadow var(--fs-dur);
 	}
-	.fs-login .cbi-page-actions .btn:hover { filter: var(--fs-hover-lift); }
+	/* the mock's .btn-primary.is-hover: deepen + lift 2px + the --s4 shadow */
+	.fs-login .cbi-page-actions .btn:hover,
+	.fs-login .cbi-page-actions input[type="submit"]:hover {
+		background: var(--fs-accent-hover);
+		transform: translateY(-2px);
+		box-shadow: 0 3.2px 7.2px rgba(0, 0, 0, .13), 0 .6px 1.8px rgba(0, 0, 0, .10);
+	}
+	/* the mock's .btn-primary.is-active: darkest blue, no lift, no shadow */
+	.fs-login .cbi-page-actions .btn:active,
+	.fs-login .cbi-page-actions input[type="submit"]:active {
+		background: #005a9e;
+		transform: translateY(0) scale(.97);
+		box-shadow: none;
+	}
+	/* keyboard focus mirrors the mock's .btn.is-focus double ring */
+	.fs-login .cbi-page-actions .btn:focus-visible,
+	.fs-login .cbi-page-actions input[type="submit"]:focus-visible {
+		box-shadow: var(--fs-focus-ring-solo);
+	}
+
+	/* the card keeps its 44/44/36 until the viewport crowds it, then breathes with the scale */
+	@media (max-width: 560px) {
+		.fs-login-card { padding: var(--fs-space-6) var(--fs-space-5); }
+	}
 }

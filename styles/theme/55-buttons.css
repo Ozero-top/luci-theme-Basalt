@@ -14,30 +14,35 @@
 		/* auto, stated: theme/60-inputs.css's generic input box says 210x32px, a base reset would lose to it by layer */
 		width: auto; height: auto;
 		min-height: var(--fs-ctl-h);
-		padding: var(--fs-space-2) var(--fs-space-3-5);
-		font-family: var(--fs-font-sans); font-weight: var(--fs-weight); line-height: 1.1;
+		padding: 0 var(--fs-space-5);
+		font-family: var(--fs-font-sans); font-weight: var(--fs-weight); font-size: var(--fs-type); line-height: 1.1;
 		color: var(--fs-text);
-		background: var(--fs-panel2);
-		border: var(--fs-hairline);
+		background: var(--fs-panel);
+		border: 1px solid var(--fs-border-strong);
 		border-radius: var(--fs-radius);
-		box-shadow: none; text-shadow: none;
+		box-shadow: var(--fs-shadow-card); text-shadow: none;
 		/* border-COLOR not the shorthand, which also animates width — a layout animation on every hover */
 		transition: var(--fs-field-transition);
 	}
-	/* bare `button` rides along: harmless on a border:0 box, meaningful once an app gives it one */
+	/* bare `button` rides along: harmless on a border:0 box, meaningful once an app gives it one.
+	 * Fluent secondary hover: a slightly greyer face, a stronger edge and a 2px float. */
 	.cbi-button:hover, .btn:hover, button:hover,
-	input[type="button"]:hover, input[type="submit"]:hover, input[type="reset"]:hover { border-color: var(--fs-dim); }
+	input[type="button"]:hover, input[type="submit"]:hover, input[type="reset"]:hover {
+		background: var(--fs-panel2);
+		border-color: var(--fs-border-strong-hover);
+		transform: translateY(-2px);
+		box-shadow: var(--fs-shadow-hover);
+	}
 
-	/* keyboard focus only: box-shadow:none above kills any stray glow, plain mouse :focus shows
-	 * nothing on purpose — the pressed cue below already answers a click */
+	/* keyboard focus only: the solo ring (surface + solid accent halo) clears 3:1 on the white
+	 * face AND on the solid fills; plain mouse :focus shows nothing on purpose */
 	.cbi-button:focus-visible, .btn:focus-visible,
 	input[type="button"]:focus-visible, input[type="submit"]:focus-visible, input[type="reset"]:focus-visible {
 		outline: none;
-		border-color: var(--fs-accent);
-		box-shadow: var(--fs-focus-ring);
+		box-shadow: var(--fs-focus-ring-solo);
 	}
-	/* solid variants sit ON --fs-accent/-good/-danger, an accent-tinted ring is invisible against
-	 * them — ring in the surface colour with a solid accent halo (--fs-focus-ring-solo) instead */
+	/* solid variants sit ON --fs-accent/-good/-danger: the solo ring above reads on them the
+	 * same way — the surface ring + solid accent halo is the single focus treatment now */
 	.cbi-button-positive:focus-visible, .cbi-button-action:focus-visible,
 	.cbi-button-negative:focus-visible, .cbi-button-remove:focus-visible,
 	.cbi-button-apply:focus-visible, .cbi-button-save:focus-visible,
@@ -48,10 +53,11 @@
 		box-shadow: var(--fs-focus-ring-solo);
 	}
 
-	/* the sole copy of the pressed inset shadow (base's identical one was absorbed) */
+	/* Fluent pressed: sink back to rest, shrink a touch, no shadow at all */
 	.cbi-button:active, .btn:active, .btn.active,
 	input[type="button"]:active, input[type="submit"]:active, input[type="reset"]:active {
-		box-shadow: inset 0 2px 4px color-mix(in srgb, var(--fs-border) 40%, transparent);
+		transform: translateY(0) scale(.97);
+		box-shadow: none;
 	}
 
 	/* three fills, not six: `.cbi-button-*` (LuCI's own views) and `.btn.<colour-word>` (third-party
@@ -71,8 +77,9 @@
 	.cbi-button-save:hover, .cbi-button-negative:hover,
 	.btn.success:hover, .btn.info:hover, .btn.danger:hover, .btn.error:hover {
 		filter: var(--fs-hover-lift); border-color: transparent;
+		transform: translateY(-2px); box-shadow: var(--fs-shadow-hover);
 	}
-	.cbi-button-reset, .cbi-button-link { background: transparent; border-color: var(--fs-border); color: var(--fs-dim); }
+	.cbi-button-reset, .cbi-button-link { background: transparent; border-color: var(--fs-border-strong); color: var(--fs-dim); box-shadow: none; }
 
 	/* .btn owns size words in full now: the plain rule above re-sets padding/radius in a later
 	 * layer, so a size word carrying only font-size (base's old copy) got default padding */
@@ -80,12 +87,12 @@
 	.btn.small { font-size: var(--fs-type-xs); min-height: var(--fs-ctl-h-sm); padding: var(--fs-space-1) var(--fs-space-2-5); border-radius: var(--fs-radius-sm); }
 
 	.cbi-section .table[id] .td .btn,
-	.cbi-section .table[id] .td .cbi-button { padding: var(--fs-space-1) var(--fs-space-2-5); font-size: var(--fs-type); }
+	.cbi-section .table[id] .td .cbi-button { padding: var(--fs-space-1) var(--fs-space-2-5); font-size: var(--fs-type); box-shadow: none; }
 	.alert-message .btn, .alert-message .cbi-button {
 		border-radius: var(--fs-radius); padding: var(--fs-space-2) var(--fs-space-3); font-weight: var(--fs-weight);
-		background: var(--fs-panel2); border: var(--fs-hairline); color: var(--fs-text);
+		background: var(--fs-panel2); border: var(--fs-hairline); color: var(--fs-text); box-shadow: none;
 	}
-	.alert-message .btn:hover { border-color: var(--fs-accent); color: var(--fs-accent); }
+	.alert-message .btn:hover { border-color: var(--fs-accent); color: var(--fs-accent); transform: none; box-shadow: none; }
 
 	/* Save/Apply footer: base renders a tall half-empty plate with bottom-only radius, made a compact rounded bar */
 	.cbi-page-actions {
@@ -135,8 +142,9 @@
 		font-family: var(--fs-font-sans); font-size: var(--fs-type); font-weight: var(--fs-weight);
 		color: var(--fs-text); background: var(--fs-panel2);
 		border: var(--fs-hairline); border-radius: var(--fs-radius-sm); cursor: pointer;
+		box-shadow: none;
 	}
-	input[type="file"]::file-selector-button:hover { border-color: var(--fs-accent); color: var(--fs-accent); }
+	input[type="file"]::file-selector-button:hover { border-color: var(--fs-accent); color: var(--fs-accent); transform: none; box-shadow: none; }
 
 	/* row-action buttons (Edit/Delete/Start-Stop): neutral outline, variants colour the ones that
 	 * carry meaning. Neutral :hover comes FIRST — after it, it would grey the coloured variants
@@ -155,8 +163,9 @@
 	.td .cbi-button, .cbi-section-actions .cbi-button, .cbi-section-table .cbi-button {
 		background: transparent;
 		border: var(--fs-hairline); color: var(--fs-dim);
+		box-shadow: none;
 	}
-	.td .cbi-button:hover { border-color: var(--fs-dim); color: var(--fs-text); }
+	.td .cbi-button:hover { border-color: var(--fs-dim); color: var(--fs-text); transform: none; box-shadow: none; }
 
 	.td .cbi-button-action, .td .cbi-button-edit, .td .cbi-button-apply,
 	.cbi-section-actions .cbi-button-edit, .cbi-section-actions .cbi-button-action {
@@ -225,6 +234,7 @@
 		border: 0; border-inline-start: var(--fs-hairline);
 		border-radius: 0;
 		background: transparent; color: var(--fs-dim);
+		box-shadow: none;
 	}
 	.cbi-dynlist > .add-item > button:hover,
 	.cbi-dynlist > .add-item > .cbi-button-add:hover { color: var(--fs-accent); }
@@ -233,6 +243,7 @@
 		background: transparent; color: var(--fs-dim);
 		padding: 0 var(--fs-space-3); min-height: var(--fs-ctl-h);
 		border-inline-start: var(--fs-hairline);
+		box-shadow: none;
 	}
 	.control-group:has(> .cbi-input-password) > button.cbi-button-neutral:hover { color: var(--fs-accent); }
 	/* SQUARE, ON THE LADDER: the only buttons once set in bare pixels (40x34, 34 being a height in
@@ -242,6 +253,7 @@
 		border-radius: var(--fs-radius); border: var(--fs-hairline);
 		background: var(--fs-panel2); color: var(--fs-text);
 		display: inline-flex; align-items: center; justify-content: center;
+		box-shadow: none;
 	}
-	.pager .btn.prev:hover, .pager .btn.next:hover { border-color: var(--fs-accent); color: var(--fs-accent); }
+	.pager .btn.prev:hover, .pager .btn.next:hover { border-color: var(--fs-accent); color: var(--fs-accent); transform: none; box-shadow: none; }
 }

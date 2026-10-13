@@ -7,7 +7,7 @@
 	 * margin-block-start: 0. */
 	.cbi-progressbar {
 		position: relative;
-		height: 10px;
+		height: 6px;
 		background: var(--fs-track);
 		border: 0;
 		border-radius: var(--fs-radius-pill);

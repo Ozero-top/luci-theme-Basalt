@@ -259,6 +259,409 @@ function renderTabMenu(node, url, level) {
 		renderTabMenu(activeNode, url + '/' + activeNode.name, (level || 0) + 1);
 }
 
+/* ---------- Search ---------- */
+
+/* Leaf pages only: a directory's href is '#' (renderMainMenu), so an index
+ * entry pointing at one would 404 the navigation. The crumb is the parent
+ * chain below the top mode level (modes contribute nothing). */
+function collectLeaves(node, url, crumbs, out) {
+	ui.menu.getChildren(node).forEach((child) => {
+		if (url === '' && child.name === 'logout')
+			return;
+
+		const childUrl = url + '/' + child.name;
+		const grandchildren = ui.menu.getChildren(child);
+
+		if (grandchildren.length)
+			collectLeaves(child, childUrl, url === '' ? crumbs : crumbs.concat(_(child.title)), out);
+		else if (url !== '')
+			out.push({ title: _(child.title), crumb: crumbs.join(' › '), href: L.url(url, child.name) });
+	});
+}
+
+const SEARCH_INDEX = [];
+
+function buildSearchIndex(tree) {
+	SEARCH_INDEX.length = 0;
+	collectLeaves(tree, '', [], SEARCH_INDEX);
+}
+
+function wireSearch() {
+	const root = document.querySelector('#fs-search');
+	if (!root)
+		return;
+
+	const field = root.querySelector('.fs-search-field'),
+	      panel = root.querySelector('.fs-search-panel'),
+	      input = root.querySelector('.fs-search-input'),
+	      list = root.querySelector('.fs-search-list'),
+	      empty = root.querySelector('.fs-search-empty');
+	if (!field || !panel || !input || !list || !empty)
+		return;
+
+	/* the kbd hint is authored for PC keyboards */
+	if (/Mac|iP(hone|ad|od)/.test(navigator.platform || ''))
+		field.querySelector('kbd').textContent = '⌘ K';
+
+	function setOpenState(on) {
+		root.classList.toggle('open', on);
+		field.setAttribute('aria-expanded', on ? 'true' : 'false');
+	}
+
+	function render(q) {
+		const query = String(q || '').trim().toLowerCase();
+		const hits = query
+			? SEARCH_INDEX.filter((e) => (e.title + ' ' + e.crumb).toLowerCase().indexOf(query) !== -1)
+			: SEARCH_INDEX;
+
+		list.innerHTML = '';
+		hits.forEach((e) => {
+			const a = E('a', { 'class': 'fs-search-item', 'href': e.href }, [
+				E('span', { 'class': 't' }, [ e.title ]),
+				E('span', { 'class': 'p' }, [ e.crumb ])
+			]);
+			list.appendChild(E('li', {}, [ a ]));
+		});
+		empty.hidden = hits.length > 0;
+		list.style.display = hits.length ? '' : 'none';
+	}
+
+	function open() {
+		closeFlyouts();
+		setOpenState(true);
+		input.value = '';
+		render('');
+		/* focus once the panel is actually displayed */
+		window.requestAnimationFrame(() => input.focus());
+	}
+
+	function close() {
+		if (!root.classList.contains('open'))
+			return;
+		setOpenState(false);
+		field.focus();
+	}
+
+	field.addEventListener('click', () => {
+		if (root.classList.contains('open'))
+			close();
+		else
+			open();
+	});
+
+	input.addEventListener('input', () => render(input.value));
+
+	input.addEventListener('keydown', (ev) => {
+		if (ev.key === 'Enter') {
+			const first = list.querySelector('a.fs-search-item');
+			if (first)
+				window.location.href = first.getAttribute('href');
+		}
+		else if (ev.key === 'Escape') {
+			ev.stopPropagation();
+			close();
+		}
+	});
+
+	/* click-outside: the panel, not the whole widget, is the popup */
+	document.addEventListener('click', (ev) => {
+		if (!ev.target.closest?.('#fs-search'))
+			setOpenState(false);
+	});
+
+	document.addEventListener('keydown', (ev) => {
+		if (ev.key === 'Escape' && root.classList.contains('open'))
+			close();
+		else if ((ev.ctrlKey || ev.metaKey) && String(ev.key).toLowerCase() === 'k') {
+			ev.preventDefault();
+			if (root.classList.contains('open'))
+				close();
+			else
+				open();
+		}
+	});
+}
+
+/* ---------- Overview page grid injector ----------
+ *
+ * luci-mod-status renders the status overview as a flat run of
+ * <h2 name="content"> + .cbi-section siblings under #view, one pair per
+ * include, appended asynchronously as each include's promise resolves.
+ * The Fluent layout needs them grouped into a card grid with per-card
+ * heads, and CSS cannot do that alone: every card is a bare table
+ * (only shape tests separate them) and the cards do not exist until the
+ * includes resolve. So a MutationObserver classifies each section as it
+ * arrives, converts its stock <h2> into a card head and moves everything
+ * into the .fs-ovl grid container (styles/pages/20-overview.css).
+ *
+ * Class meaning (first match wins):
+ *   ports  switch-port card — its boxes carry /port_*.svg images
+ *   net    interface card   — any other .ifacebox card
+ *   sto    meter card       — progressbars (mounts / storage)
+ *   lease  data table       — has a header row (DHCP leases)
+ *   sys    first key/value  — the system properties card
+ *   mem    later key/value  — memory and anything else table-shaped
+ */
+
+const OV_PAGE = 'admin-status-overview';
+
+/* Card-head glyphs; net reuses the chrome network mark (ICONS above). */
+const OV_ICONS = Object.assign(Object.create(null), {
+	sys:   '<circle cx="12" cy="12" r="8.5"/><path d="M12 11.2V16"/><path d="M12 8.2h.01"/>',
+	mem:   '<path d="M3.5 12h4L10 6l4 12 2.5-6h4"/>',
+	sto:   '<rect x="3.5" y="8" width="17" height="8" rx="2"/><path d="M7 12h.01M11 12h6"/>',
+	ports: '<path d="M9 7V4M15 7V4"/><rect x="6.5" y="7" width="11" height="6.5" rx="1.5"/><path d="M12 13.5V20"/>',
+	doc:   '<rect x="5" y="3.5" width="14" height="17" rx="2"/><path d="M9 9h6M9 12.5h6M9 16h4"/>'
+});
+
+function ovIcon(kind) {
+	const body = OV_ICONS[kind]
+		|| (kind === 'net' ? ICONS.network : null)
+		|| ICONS._default;
+	return '<svg class="fs-ico" aria-hidden="true" viewBox="0 0 24 24" fill="none" '
+		+ 'stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">'
+		+ body + '</svg>';
+}
+
+/* null: not rendered yet (the include appends later) — retried next pass */
+function classifyOvSection(sec, state) {
+	if (sec.querySelector('.ifacebox img[src*="/port_"]'))
+		return 'ports';
+	if (sec.querySelector('.ifacebox'))
+		return 'net';
+	if (sec.querySelector('.cbi-progressbar'))
+		return 'sto';
+	const table = sec.querySelector('.table');
+	if (table && (table.querySelector('.th') || table.querySelector('.td:nth-child(3)')))
+		return 'lease';
+	if (table)
+		return state.kv++ ? 'mem' : 'sys';
+	return null;
+}
+
+function ovPass(view, state) {
+	ovRaf = 0;
+	if (view.getAttribute('data-page') !== OV_PAGE)
+		return;
+
+	/* a fresh page render drops the old grid, so the key/value counter
+	 * that picks sys over mem resets with it */
+	let wrap = view.querySelector(':scope > .fs-ovl');
+	if (!wrap) {
+		wrap = E('div', { 'class': 'fs-ovl' });
+		state.kv = 0;
+	}
+	if (wrap.parentElement !== view)
+		view.appendChild(wrap);
+
+	Array.from(view.children).forEach((node) => {
+		if (node === wrap || !node.classList?.contains('cbi-section'))
+			return;
+		const kind = node.dataset.fsKind || classifyOvSection(node, state);
+		if (!kind)
+			return;
+		if (!node.dataset.fsKind) {
+			node.dataset.fsKind = kind;
+			node.classList.add('fs-ovl-' + kind);
+		}
+		/* the stock <h2> directly before the section is the card title */
+		const h2 = node.previousElementSibling;
+		if (h2 && h2.matches('h2[name="content"]') && !node.querySelector(':scope > .fs-ovl-head')) {
+			const title = h2.textContent.trim();
+			h2.remove();
+			node.prepend(E('div', { 'class': 'fs-ovl-head' }, [
+				E('span', { 'class': 'fs-ovl-ico', 'aria-hidden': 'true' }, ovIcon(kind)),
+				E('h3', { 'class': 'fs-ovl-title' }, [title])
+			]));
+		}
+		if (node.parentElement !== wrap)
+			wrap.appendChild(node);
+	});
+
+	/* one card per column pair: with no storage card, memory spans both rows */
+	wrap.classList.toggle('fs-ovl-nosto', !wrap.querySelector('.fs-ovl-sto'));
+}
+
+let ovRaf = 0;
+
+function watchOverview() {
+	const view = document.getElementById('view');
+	if (!view)
+		return;
+	const state = { kv: 0 };
+	const schedule = () => {
+		if (ovRaf)
+			return;
+		ovRaf = window.requestAnimationFrame(() => ovPass(view, state));
+	};
+	/* childList only: poll updates replace a card's innards, never its
+	 * position, so attribute/subtree churn needs no re-classification */
+	new MutationObserver(schedule).observe(view, { childList: true });
+	schedule();
+}
+
+/* ---------- Fluent page head (styles/pages/15-pagehead.css) ---------- */
+
+/* Feeds pgBreadcrumbs(); assigned once per render() */
+let fsMenuTree = null;
+const pgState = { page: null };
+
+/* The last two named nodes of the dispatch path ("Network › Interfaces"),
+ * decorative only — the sr-only .fs-title stays the real heading */
+function pgBreadcrumbs() {
+	const names = L.env.dispatchpath || [];
+	let node = fsMenuTree;
+	const trail = [];
+
+	for (let i = 0; node && i < names.length; i++) {
+		node = node.children && node.children[names[i]];
+		if (node?.title)
+			trail.push(_(node.title));
+	}
+
+	return trail.slice(-2);
+}
+
+function pgheadPass() {
+	const content = document.querySelector('.fs-content');
+	if (!content)
+		return;
+
+	/* data-page is server-rendered on .fs-content; #view may repeat it */
+	const view = document.getElementById('view');
+	const page = content.getAttribute('data-page')
+		|| (view ? view.getAttribute('data-page') : '') || '';
+
+	const old = content.querySelector(':scope > .fs-pghead');
+
+	/* only an action bar OUTSIDE the head triggers a rebuild: once
+	 * migrated it lives inside .fs-pghead, and re-using the node instead
+	 * of rebuilding keeps its LuCI event listeners alive */
+	const stray = Array.from(content.querySelectorAll('.cbi-page-actions'))
+		.find((a) => !a.closest('.fs-pghead'));
+
+	if (old && pgState.page === page && !stray)
+		return;
+	pgState.page = page;
+
+	const actions = E('div', { 'class': 'fs-pg-actions' });
+	/* a page change rebuilds the head — carry the already-migrated bar
+	 * over instead of dropping it (no-op on the stock no-SPA flow) */
+	const carried = old?.querySelector('.cbi-page-actions');
+	if (stray) {
+		/* the bar may end up outside its <form>; re-bind the controls so
+		 * submit/save keep working (nested forms are left alone) */
+		const form = stray.closest('form');
+		if (form && !form.id)
+			form.id = 'fs-form-' + (page || 'page');
+		if (form)
+			stray.querySelectorAll('button, input, select, textarea, label').forEach((ctl) => {
+				if (ctl.closest('form') === form)
+					ctl.setAttribute('form', form.id);
+			});
+		actions.appendChild(stray);
+	} else if (carried) {
+		actions.appendChild(carried);
+	}
+
+	const crumbs = pgBreadcrumbs();
+	const title = document.querySelector('.fs-title-main')?.textContent.trim() || '';
+	/* E() takes a single data argument: children go in as one array */
+	const head = E('div', { 'class': 'fs-pghead' }, [
+		E('div', { 'class': 'fs-pghead-main' }, [
+			...(crumbs.length > 1 ? [E('nav', { 'class': 'fs-crumbs', 'aria-hidden': 'true' },
+				crumbs.map((c) => E('span', {}, [c])))] : []),
+			E('div', { 'class': 'fs-pg-title', 'aria-hidden': 'true' }, [title])
+		]),
+		actions
+	]);
+
+	/* stock CBI repeats the page title as the map heading; with the head
+	 * carrying it the duplicate is noise (netPass falls back to the page
+	 * title for its card head) */
+	if (title)
+		content.querySelectorAll('.cbi-map > h2[name="content"]').forEach((h2) => {
+			if (h2.textContent.trim() === title)
+				h2.remove();
+		});
+
+	old?.remove();
+
+	/* before #tabmenu, not #view: the DOM must read head → tabs → alerts
+	 * → content (the uci-changes banner is server-rendered after
+	 * #tabmenu in header.ut) */
+	const tabmenu = content.querySelector(':scope > #tabmenu');
+	content.insertBefore(head, tabmenu || view || null);
+}
+
+/* ---------- Interfaces card head ---------- */
+
+const NET_PAGE = 'admin-network-interfaces';
+
+function netPass(content) {
+	if ((content.getAttribute('data-page') || '') !== NET_PAGE)
+		return;
+
+	const sec = content.querySelector('.cbi-section');
+	if (!sec || sec.querySelector(':scope > .fs-card-head'))
+		return;
+
+	/* the stock <h2> before the section (or at the top of its map) is
+	 * the card title — same contract as ovPass; pgheadPass may have
+	 * absorbed it as a duplicate of the page title, in which case the
+	 * card head reuses the page title */
+	let h2 = sec.previousElementSibling;
+	if (!(h2 && h2.matches('h2[name="content"]')))
+		h2 = sec.closest('.cbi-map')?.querySelector(':scope > h2[name="content"]');
+	const title = h2 ? h2.textContent.trim()
+		: content.querySelector('.fs-pg-title')?.textContent.trim() || '';
+	if (!title)
+		return;
+	if (h2)
+		h2.remove();
+
+	/* an "Add interface" control, wherever the view parked it — unless
+	 * it belongs to the (migrated) page actions bar */
+	const more = Array.from(content.querySelectorAll('.cbi-button-add'))
+		.find((b) => !b.closest('.fs-pghead') && !b.closest('.cbi-page-actions'));
+
+	sec.prepend(E('div', { 'class': 'fs-card-head' }, [
+		E('span', { 'class': 'fs-card-ico', 'aria-hidden': 'true' }, ovIcon('net')),
+		E('h3', { 'class': 'fs-card-title' }, [title]),
+		...(more ? [E('div', { 'class': 'fs-card-more' }, [more])] : [])
+	]));
+}
+
+/* ---------- Page-level watcher ---------- */
+
+let pgRaf = 0;
+let pgObserver = null;
+
+function watchPage() {
+	const view = document.getElementById('view');
+	const content = document.querySelector('.fs-content');
+	if (!content || pgObserver)
+		return;
+
+	const schedule = () => {
+		if (pgRaf)
+			return;
+		pgRaf = window.requestAnimationFrame(() => {
+			pgRaf = 0;
+			pgheadPass();
+			netPass(document.querySelector('.fs-content') || content);
+		});
+	};
+
+	/* #view is the stable node the dispatcher keeps refilling (spinner →
+	 * view nodes → footer); the passes are idempotent, so the extra
+	 * invocations are cheap no-ops. The head's own churn in .fs-content
+	 * is a sibling of #view, never a child, so it cannot re-trigger. */
+	pgObserver = new MutationObserver(schedule);
+	pgObserver.observe(view || content, { childList: true });
+	schedule();
+}
+
 return baseclass.extend({
 	__init__: function() {
 		ui.menu.load().then(L.bind(this.render, this));
@@ -268,6 +671,14 @@ return baseclass.extend({
 		document.addEventListener('click', (ev) => {
 			if (!ev.target.closest?.('#topmenu > li.has-sub'))
 				closeFlyouts();
+		});
+
+		/* the uci-changes banner's × (header.ut): dismiss is cosmetic,
+		 * the poll indicators keep tracking the real state */
+		document.addEventListener('click', (ev) => {
+			const btn = ev.target.closest?.('.fs-alert-close');
+			if (btn)
+				btn.closest('.alert-message')?.remove();
 		});
 		document.addEventListener('keydown', (ev) => {
 			if (ev.key !== 'Escape')
@@ -296,9 +707,13 @@ return baseclass.extend({
 				clearClamps();
 			});
 		});
+
+		wireSearch();
 	},
 
 	render: function(tree) {
+		fsMenuTree = tree;
+
 		const modemenu = document.querySelector('#modemenu'),
 		      topmenu = document.querySelector('#topmenu'),
 		      tabmenu = document.querySelector('#tabmenu');
@@ -314,6 +729,7 @@ return baseclass.extend({
 		tabmenu.style.display = 'none';
 
 		renderModeMenu(tree);
+		buildSearchIndex(tree);
 
 		if (L.env.dispatchpath.length >= 3) {
 			let node = tree, url = '';
@@ -324,5 +740,11 @@ return baseclass.extend({
 			if (node)
 				renderTabMenu(node, url);
 		}
+
+		/* status overview: group the stock include cards into the Fluent
+		 * grid (styles/pages/20-overview.css); the observer rides along
+		 * for the whole session and no-ops on every other page */
+		watchOverview();
+		watchPage();
 	}
 });

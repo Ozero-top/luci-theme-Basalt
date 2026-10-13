@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-layout="top" data-darkmode="true" data-theme="dark" data-bs-theme="dark">
+<html lang="zh-CN" data-layout="top" data-darkmode="false" data-theme="light" data-bs-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -199,18 +199,18 @@ window.L = new LuCI({
 	const topPill = (name) => document.querySelector('#topmenu > li[data-name="' + name + '"] > a');
 	const panelOf = (name) => document.querySelector('#topmenu > li[data-name="' + name + '"] > ul');
 
-	/* ============ dark tokens / pattern ============ */
+	/* ============ light tokens / pattern ============ */
 	const css = getComputedStyle(rootEl);
 	check('html is fixed top layout', rootEl.getAttribute('data-layout') === 'top');
-	check('html forced dark', rootEl.getAttribute('data-darkmode') === 'true' &&
-		rootEl.getAttribute('data-bs-theme') === 'dark');
-	check('--fs-bg is charcoal #1c2128',
-		css.getPropertyValue('--fs-bg').trim() === '#1c2128',
+	check('html forced light', rootEl.getAttribute('data-darkmode') === 'false' &&
+		rootEl.getAttribute('data-bs-theme') === 'light');
+	check('--fs-bg is Fluent light #f3f2f1',
+		css.getPropertyValue('--fs-bg').trim() === '#f3f2f1',
 		css.getPropertyValue('--fs-bg').trim());
 	/* The opaque canvas colour lives on <html>; body/.fs-main/footer must stay
 	 * transparent so the z-index:-1 pattern layer is not covered. */
 	const rootBg = getComputedStyle(document.documentElement).backgroundColor;
-	check('html canvas painted charcoal', rootBg === 'rgb(28, 33, 40)', rootBg);
+	check('html canvas painted #f3f2f1', rootBg === 'rgb(243, 242, 241)', rootBg);
 	const transparentEls = [document.body, document.querySelector('.fs-main'),
 		document.querySelector('footer.fs-footer')];
 	check('body/.fs-main/footer transparent for the pattern',
@@ -231,14 +231,10 @@ window.L = new LuCI({
 	check('wordmark kept on a single line', wmStyle.whiteSpace === 'nowrap' &&
 		wmStyle.webkitLineClamp === 'none', wmStyle.whiteSpace + '/' + wmStyle.webkitLineClamp);
 
-	/* page cards are translucent so the texture reads through; dropdown
-	 * panels and modal chrome stay opaque for legibility */
+	/* page cards are opaque panel white in Fluent light; dropdown panels
+	 * and modal chrome share the guarantee for legibility */
 	const cardBg = getComputedStyle(document.querySelector('.cbi-section')).backgroundColor;
-	/* alpha may serialize as rgba(r,g,b,a) or, in modern engines,
-	 * color(srgb r g b / a) after color-mix() resolves */
-	const cardAlphaMatch = cardBg.match(/(?:rgba\([^)]*,\s*|\/\s*)([01](?:\.\d+)?)\)$/);
-	const cardAlpha = Number(cardAlphaMatch ? cardAlphaMatch[1] : 1);
-	check('content cards are translucent', cardAlpha > 0 && cardAlpha < 1, cardBg);
+	check('content cards are opaque panel white', cardBg === 'rgb(255, 255, 255)', cardBg);
 
 	check('skip link present', !!document.querySelector('a.fs-skip[href="#maincontent"]'));
 	check('sr-only h1 clipped', /inset/.test(getComputedStyle(document.querySelector('.fs-title')).clipPath));
@@ -269,6 +265,36 @@ window.L = new LuCI({
 			!tabItems[1].classList.contains('active'));
 		check('#tabmenu shown', document.getElementById('tabmenu').style.display !== 'none');
 	}
+
+	/* ============ Fluent page head (menu-basalt.js injector) ============ */
+	/* the injector runs in a rAF; give it a beat before asserting */
+	for (let i = 0; i < 50 && !document.querySelector('.fs-content > .fs-pghead'); i++)
+		await wait(20);
+	const pghead = document.querySelector('.fs-content > .fs-pghead');
+	check('.fs-pghead injected', !!pghead);
+	check('head mounts before #tabmenu',
+		!!pghead && pghead.nextElementSibling === document.getElementById('tabmenu'));
+	check('page title rendered in the head',
+		document.querySelector('.fs-pg-title')?.textContent.trim() === 'iStoreOS');
+	const wantCrumbs = aliasMode ? '状态|概览' : '管理权|密码设置';
+	check('crumbs keep the last two named nodes',
+		Array.from(document.querySelectorAll('.fs-crumbs span')).map(s => s.textContent).join('|')
+			=== wantCrumbs);
+	const migratedBar = document.querySelector('.fs-pg-actions .cbi-page-actions');
+	check('actions bar migrated into the head', !!migratedBar &&
+		document.querySelectorAll('.fs-content .cbi-page-actions').length === 1);
+	check('migrated bar drops its own rhythm', !!migratedBar &&
+		getComputedStyle(migratedBar).marginTop === '0px' &&
+		getComputedStyle(migratedBar).marginBottom === '0px' &&
+		getComputedStyle(migratedBar).paddingTop === '0px');
+
+	/* the uci banner's × removes its alert (document-level delegate) */
+	const fakeAlert = document.createElement('div');
+	fakeAlert.className = 'alert-message info fs-uci-alert';
+	fakeAlert.innerHTML = '<button type="button" class="fs-alert-close"></button>';
+	document.querySelector('.fs-content').appendChild(fakeAlert);
+	fakeAlert.querySelector('.fs-alert-close').click();
+	check('uci banner dismiss removes the alert', !fakeAlert.isConnected);
 
 	/* ============ pill markup / icons ============ */
 	const pills = Array.from(document.querySelectorAll('#topmenu > li'));
@@ -467,6 +493,8 @@ window.L = new LuCI({
 		['fieldset.cbi-section .cbi-value', 'value row'],
 		['.cbi-value-title', 'value title'],
 		['.cbi-page-actions', 'page actions'],
+		['.fs-pghead', 'page head'],
+		['.fs-pg-actions', 'page head actions'],
 		['.cbi-page-actions .cbi-button', 'action button'],
 		['#topmenu > li > a', 'nav pill']
 	];
@@ -523,7 +551,7 @@ window.L = new LuCI({
 	} else {
 		const pillCS = getComputedStyle(document.querySelector('#topmenu > li > a'));
 		check('nav pill padding survives the reset (narrow)',
-			parseFloat(pillCS.paddingTop) > 0, pillCS.paddingTop);
+			parseFloat(pillCS.paddingLeft) > 0, pillCS.paddingLeft);
 	}
 
 	const failed = results.filter(r => !r.ok).length;

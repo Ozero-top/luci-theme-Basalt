@@ -17,12 +17,23 @@
 	const hostname = striptags(boardinfo.hostname ?? 'OpenWrt');
 	const empty_password = (getuid() == 0 && getspnam('root')?.pwdp === '');
 
+	/* the user chip: display name from the session store, initial for the avatar */
+	const fs_username = ctx.authsession
+		? striptags(ubus.call('session', 'get', { ids: [ctx.authsession] })?.values?.[ctx.authsession]?.data?.username ?? 'root')
+		: '';
+
 	http.prepare_content('text/html; charset=UTF-8');
 
 	const fs_page = entityencode(join('-', length(ctx.path) ? ctx.path : ctx.request_path), true);
+
+	/* unsaved-changes count for the Fluent banner under the page head */
+	const fs_changes = ctx.authsession ? (ubus.call('uci', 'changes') ?? {}) : {};
+	let fs_change_count = 0;
+	for (let cfgname, arr in (fs_changes.changes ?? {}))
+		fs_change_count += length(arr ?? []);
 -%}
 <!DOCTYPE html>
-<html lang="{{ dispatcher.lang }}" data-layout="top" data-darkmode="true" data-theme="dark" data-bs-theme="dark">
+<html lang="{{ dispatcher.lang }}" data-layout="top" data-darkmode="false" data-theme="light" data-bs-theme="light">
 
 <head>
 	{% include("themes/" + theme + "/head_meta", { hostname: hostname, node: node }) %}
@@ -41,9 +52,9 @@
 	<script src="{{ resource }}/luci.js?v={{ version.luciversion }}"></script>
 </head>
 
-<!-- theme="dark": iStoreOS apps (quickstart, VUM, iStore) read this Argon-established
-     contract to switch their bundled palettes; Basalt is always dark -->
-<body class="lang_{{ dispatcher.lang }}{% if (ctx.authsession): %} logged-in{% endif %}" theme="dark" data-page="{{ fs_page }}">
+<!-- theme="light": iStoreOS apps (quickstart, VUM, iStore) read this Argon-established
+     contract to switch their bundled palettes; Basalt is Fluent light -->
+<body class="lang_{{ dispatcher.lang }}{% if (ctx.authsession): %} logged-in{% endif %}" theme="light" data-page="{{ fs_page }}">
 
 	<div class="fs-pattern" data-fs-chrome aria-hidden="true"></div>
 
@@ -66,8 +77,27 @@
 			<ul class="nav" id="topmenu"></ul>
 			<ul id="modemenu" class="fs-modemenu"></ul>
 
+			<div class="fs-search" id="fs-search" data-fs-chrome>
+				<button type="button" class="fs-search-field" aria-expanded="false" aria-haspopup="true" aria-controls="fs-search-panel">
+					<svg class="fs-ico" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+					<span class="fs-ph">{{ _('Search settings…') }}</span>
+					<kbd>Ctrl K</kbd>
+				</button>
+				<div class="fs-search-panel" id="fs-search-panel">
+					<input type="text" class="fs-search-input" placeholder="{{ _('Type to search…') }}" aria-label="{{ _('Search settings') }}">
+					<ul class="fs-search-list"></ul>
+					<div class="fs-search-empty" hidden>{{ _('No results') }}</div>
+				</div>
+			</div>
+			<span class="fs-vr" aria-hidden="true"></span>
+
 			{% if (dispatcher.lookup("admin/logout")): %}
 			<a class="fs-logout" href="{{ dispatcher.build_url('admin/logout') }}" title="{{ entityencode(_('Log out'), true) }}" aria-label="{{ entityencode(_('Log out'), true) }}">
+				<span class="fs-avatar" aria-hidden="true">{{ entityencode(fs_username ? substr(fs_username, 0, 1) : 'R', true) }}</span>
+				<span class="fs-who">
+					<span class="fs-name">{{ entityencode(length(fs_username) ? fs_username : 'root', true) }}</span>
+					<span class="fs-role">{{ _('Administrator') }}</span>
+				</span>
 				<svg class="fs-ico" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M10 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4"/><path d="M14 12h7m0 0-3-3m3 3-3 3"/></svg>
 				<span class="fs-label">{{ _('Log out') }}</span>
 			</a>
@@ -108,4 +138,15 @@
 				</noscript>
 
 				<div id="tabmenu" style="display:none"></div>
+
+				{% if (fs_change_count > 0): %}
+				<div class="alert-message info fs-uci-alert">
+					<span class="fs-a-ico" aria-hidden="true"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 11.2V16"/><path d="M12 8.2h.01"/></svg></span>
+					<div class="fs-a-body">
+						<h4>{{ _('There are %d unsaved configuration changes').format(fs_change_count) }}</h4>
+						<p>{{ _('Open the affected page to review the changes or apply them to make them take effect.') }}</p>
+					</div>
+					<button type="button" class="fs-alert-close" aria-label="{{ _('Dismiss') }}"><svg class="fs-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+				</div>
+				{% endif %}
 	{% endif %}

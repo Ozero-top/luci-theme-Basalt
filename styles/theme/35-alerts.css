@@ -1,38 +1,34 @@
 @layer theme {
-	/* alert panel: a left accent stripe on a panel card; variants recolour the frame */
+	/* Fluent alert: a status tint with a matching 1px edge — no left stripe, no card frame.
+	 * Untyped alerts read informational (the previous stripe default), variants recolour both. */
 	.alert-message {
-		padding: var(--fs-space-3-5) var(--fs-space-4);
-		border-radius: var(--fs-radius-lg);
-		border: var(--fs-hairline);
-		/* logical: the stripe marks the READING start, swapping sides in RTL (LuCI ships ar/fa/he) */
-		border-inline-start: 3px solid var(--fs-accent);
-		/* --fs-panel stays the background-COLOUR; the tint is a background-IMAGE layer over it,
-		 * not a replacement — a `-fill` background alone is transparent to the wallpaper. */
-		background-color: var(--fs-panel);
-		background-image: linear-gradient(var(--fs-alert-tint, transparent), var(--fs-alert-tint, transparent));
+		padding: var(--fs-space-3) var(--fs-space-4);
+		border-radius: var(--fs-radius);
+		border: 1px solid color-mix(in srgb, var(--fs-accent) 28%, transparent);
+		background-color: var(--fs-accent-bg);
 		color: var(--fs-text);
 		gap: var(--fs-space-3);
 	}
-	/* status lives in stripe+surface, ring stays neutral. :not(.btn) is load-bearing: a confirm
-	 * control is a `<label class="btn alert-message danger">`, and without the guard the tint
+	/* status lives in tint+edge. :not(.btn) is load-bearing: a confirm control is a
+	 * `<label class="btn alert-message danger">`, and without the guard the tint
 	 * out-ranked `.btn.danger`, fading its fill. */
 	.alert-message.warning:not(.btn) {
-		border-color: var(--fs-border); border-inline-start-color: var(--fs-warn);
-		--fs-alert-tint: var(--fs-warn-fill);
+		border-color: color-mix(in srgb, var(--fs-warn) 28%, transparent);
+		background-color: var(--fs-warn-bg);
 	}
 	.alert-message.error:not(.btn), .alert-message.danger:not(.btn) {
-		border-color: var(--fs-border); border-inline-start-color: var(--fs-danger);
-		--fs-alert-tint: var(--fs-danger-fill);
+		border-color: color-mix(in srgb, var(--fs-danger) 30%, transparent);
+		background-color: var(--fs-danger-bg);
 	}
 	.alert-message.success:not(.btn) {
-		border-inline-start-color: var(--fs-good);
-		--fs-alert-tint: var(--fs-good-fill);
+		border-color: color-mix(in srgb, var(--fs-good) 25%, transparent);
+		background-color: var(--fs-good-bg);
 	}
 	/* .notice groups HERE, not with .label.notice's accent: ui.js emits `notice spinning` for an
 	 * IN-PROGRESS banner, so it reads as informational rather than success. */
 	.alert-message.info:not(.btn), .alert-message.notice:not(.btn) {
-		border-inline-start-color: var(--fs-accent);
-		--fs-alert-tint: var(--fs-accent-fill);
+		border-color: color-mix(in srgb, var(--fs-accent) 28%, transparent);
+		background-color: var(--fs-accent-bg);
 	}
 
 	/* spinner ::before is inline-block for its usual inline hosts, but displayStatus() builds a
@@ -127,4 +123,42 @@
 	/* opaque surface (--fs-panel2 inherited): accent text on --fs-accent-soft measured 4.21:1
 	 * (theme/65-dropdown.css) — the border carries the accent instead */
 	.cbi-title .label.notice { opacity: 1; color: var(--fs-accent); border-color: var(--fs-accent); }
+
+	/* the uci-changes banner (header.ut): icon / body / dismiss. Its outer
+	 * rhythm comes from the guard's .alert-message margin (unlayered wins) */
+	.fs-uci-alert {
+		display: flex;
+		align-items: flex-start;
+	}
+	.fs-uci-alert .fs-a-ico {
+		display: inline-flex;
+		flex: 0 0 auto;
+		margin-top: 2px;
+		color: var(--fs-accent);
+	}
+	.fs-uci-alert .fs-a-ico .fs-ico { width: 18px; height: 18px; }
+	.fs-uci-alert .fs-a-body { flex: 1 1 auto; min-width: 0; }
+	/* the section rule's space-1 bottom gap reads right against the tint; drop only its top */
+	.fs-uci-alert h4 { margin-top: 0; }
+
+	/* the banner's × — ghost chip, subtle hover */
+	.fs-alert-close {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		flex: 0 0 auto;
+		width: 28px;
+		height: 28px;
+		padding: 0;
+		margin: -4px -6px 0 0;
+		border: 0;
+		border-radius: var(--fs-radius-sm);
+		background: transparent;
+		color: var(--fs-dim);
+		cursor: pointer;
+		transition: background-color var(--fs-dur), color var(--fs-dur);
+	}
+	.fs-alert-close:hover { background: color-mix(in srgb, var(--fs-text) 8%, transparent); color: var(--fs-text); }
+	.fs-alert-close:focus-visible { outline: none; box-shadow: var(--fs-focus-ring); }
+	.fs-alert-close .fs-ico { width: 16px; height: 16px; }
 }

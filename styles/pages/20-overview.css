@@ -55,26 +55,61 @@
 	/* hideEmptyCard() marks a stock include with nothing to show; drop it */
 	:where(#view)[data-page="admin-status-overview"] .cbi-section.fs-ovl-empty { display: none; }
 
-	/* stock <h2> duplicate of the chrome's title; via .fs-content not #view — docs/css.md above */
+	/* stock <h2> duplicate of the chrome's title; via .fs-content not #view — docs/css.md above.
+	 * menu-basalt.js consumes it into the card head; this stays for no-JS renders. */
 	.fs-content[data-page="admin-status-overview"] h2[name="content"] { display: none; }
+
+	/* The include cards, grouped into .fs-ovl by menu-basalt.js. 12 columns so the
+	 * three measured row ratios of the mockup land on whole tracks: system 8/12
+	 * vs memory column 4/12 (the 2:1 row A), interfaces 5/12 vs leases 7/12
+	 * (the 3:4 row C). docs/css.md "Overview: the grid". */
 	.fs-ovl {
 		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: var(--fs-space-4);
+		grid-template-columns: repeat(12, minmax(0, 1fr));
+		gap: var(--fs-card-gap);
 		margin-bottom: var(--fs-card-gap);	/* match stock .cbi-section spacing below the grid */
 	}
-	/* min-width:0 so an item shrinks to its TRACK, not its content's min-width — docs/css.md above */
-	.fs-ovl > .fs-ovl-sys,
-	.fs-ovl > .fs-ovl-mem,
-	.fs-ovl > .fs-ovl-sto { margin: 0; min-width: 0; }
-	.fs-ovl > .fs-ovl-sys { grid-column: 1; grid-row: 1 / 3; }
-	.fs-ovl > .fs-ovl-mem { grid-column: 2; grid-row: 1; }
-	.fs-ovl > .fs-ovl-sto { grid-column: 2; grid-row: 2; }
+	/* grid children carry no stock flow spacing — the grid's gap is the rhythm.
+	 * min-width:0 so an item shrinks to its TRACK, not its content's min-width — docs/css.md above */
+	.fs-ovl > * { grid-column: 1 / -1; margin: 0; min-width: 0; }
+	.fs-ovl > .fs-ovl-sys { grid-area: 1 / 1 / 3 / 9; }
+	.fs-ovl > .fs-ovl-mem { grid-area: 1 / 9 / 2 / 13; }
+	.fs-ovl > .fs-ovl-sto { grid-area: 2 / 9 / 3 / 13; }
+	/* no storage include rendered: memory takes the whole right column (menu-basalt.js
+	 * toggles .fs-ovl-nosto on the grid) */
+	.fs-ovl.fs-ovl-nosto > .fs-ovl-mem { grid-area: 1 / 9 / 3 / 13; }
+	.fs-ovl > .fs-ovl-net   { grid-column: 1 / 6; }
+	.fs-ovl > .fs-ovl-lease { grid-column: 6 / 13; }
 	@container fs-view (max-width: 800px) {
 		.fs-ovl { grid-template-columns: 1fr; }
-		.fs-ovl > .fs-ovl-sys,
-		.fs-ovl > .fs-ovl-mem,
-		.fs-ovl > .fs-ovl-sto { grid-column: 1; grid-row: auto; }
+		.fs-ovl > * { grid-column: 1; grid-row: auto; }
+	}
+
+	/* card head, rebuilt from the stock <h2> by menu-basalt.js: soft accent
+	 * icon chip + localized title; spacing to the card body below */
+	.fs-ovl-head {
+		display: flex;
+		align-items: center;
+		gap: var(--fs-space-2);
+		margin: 0 0 var(--fs-space-3);
+	}
+	.fs-ovl-ico {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 32px;
+		height: 32px;
+		flex: 0 0 auto;
+		border-radius: var(--fs-radius-sm);
+		background: var(--fs-accent-fill);
+		color: var(--fs-accent);
+	}
+	.fs-ovl-ico .fs-ico { width: 18px; height: 18px; }
+	.fs-ovl-title {
+		margin: 0;
+		font-size: var(--fs-type-lg);
+		font-weight: var(--fs-weight);
+		line-height: var(--fs-leading-tight);
 	}
 
 	/* Port status reskin. Scoped to :has(img[src*="/port_"]) — do not unscope, Network/Wireless

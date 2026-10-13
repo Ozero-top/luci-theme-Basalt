@@ -1,46 +1,61 @@
 @layer tokens {
-	/* Basalt v2: single dark palette, vendored from footstrap's dark
-	 * "footstrap/GitHub Primer dimmed" colourway. Light mode, the alternate
-	 * palettes and every appearance axis were intentionally removed — the
-	 * chrome hardcodes <html data-darkmode="true">. */
+	/* Basalt v2.1: single light palette, Microsoft Fluent 2 colourway.
+	 * Light mode, the alternate palettes and every appearance axis were
+	 * intentionally removed — the chrome hardcodes <html data-darkmode="false">. */
 	:root {
 		/* surfaces */
-		--fs-bg: #1c2128;
-		--fs-bg-base: #1c2128;
-		--fs-panel: #22272e;
-		--fs-panel-base: #22272e;
-		--fs-panel2: #2d333b;
-		--fs-panel2-base: #2d333b;
-		--fs-border: #444c56;
-		--fs-border-base: #444c56;
-		--fs-track: #373e47;
+		--fs-bg: #f3f2f1;
+		--fs-bg-base: #f3f2f1;
+		--fs-panel: #ffffff;
+		--fs-panel-base: #ffffff;
+		--fs-panel2: #faf9f8;
+		--fs-panel2-base: #faf9f8;
+		--fs-border: #e1e1e1;
+		--fs-border-base: #e1e1e1;
+		--fs-border-strong: #8a8886;		/* control edges: buttons, fields */
+		--fs-border-strong-hover: #6b6a69;
+		--fs-track: #ebebea;
 
 		/* ink */
-		--fs-text: #adbac7;
-		--fs-dim: #8f9cab;
-		--fs-faint: #959ca5;
+		--fs-text: #323130;
+		--fs-dim: #605e5c;
+		--fs-faint: #a19f9d;
 
-		/* accent + status (dark fills use dark ink #10151c) */
-		--fs-accent: #569df5;
-		--fs-accent-base: #569df5;
+		/* accent + status (solid fills carry white ink) */
+		--fs-accent: #0078d4;
+		--fs-accent-base: #0078d4;
+		/* brand mark gradient stops (mock: 160deg, a -> b 58% -> c) */
+		--fs-brand-a: #2b95e0;
+		--fs-brand-b: #0078d4;
+		--fs-brand-c: #005a9e;
 		--fs-accent-soft: color-mix(in srgb, var(--fs-accent) 15%, transparent);
-		--fs-good: #5aad5d;
-		--fs-good-base: #5aad5d;
-		--fs-warn: #c79128;
-		--fs-warn-base: #c79128;
-		--fs-danger: #ea7a74;
-		--fs-danger-base: #ea7a74;
-		--fs-on-accent: #10151c;
-		--fs-on-good: #10151c;
-		--fs-on-warn: #10151c;
-		--fs-on-danger: #10151c;
+		--fs-good: #0f7b0f;
+		--fs-good-base: #0f7b0f;
+		--fs-warn: #8a6411;
+		--fs-warn-base: #8a6411;
+		--fs-danger: #e81123;
+		--fs-danger-base: #e81123;
+		--fs-on-accent: #ffffff;
+		--fs-on-good: #ffffff;
+		--fs-on-warn: #ffffff;
+		--fs-on-danger: #ffffff;
 
-		/* placeholder ink (dark mix) */
-		--fs-placeholder-mix: 64%;
+		/* Fluent status washes — badge/alert tints deeper than the 12-18% mixes */
+		--fs-accent-bg: #deecf9;
+		--fs-good-bg: #dff6dd;
+		--fs-warn-bg: #fff4ce;
+		--fs-danger-bg: #fde7e9;
+
+		/* Fluent control states (mock --blue-hover / .switch off fill / row separator) */
+		--fs-accent-hover: #106ebe;
+		--fs-switch-off: #b9b7b5;
+		--fs-row-line: #f0efee;
+
+		/* placeholder ink (light mix) */
+		--fs-placeholder-mix: 30%;
 		--fs-placeholder: color-mix(in oklch, var(--fs-text) var(--fs-placeholder-mix), var(--fs-panel2));
 
-		/* inert wallpaper axes — the built-in cat pattern is always on,
-		 * see theme/15-wallpaper.css */
+		/* inert wallpaper axes — see theme/15-wallpaper.css */
 		--fs-login-bg-url: none;
 		--fs-photo-dim: 74%;
 		--fs-photo-scrim: color-mix(in srgb, var(--fs-bg-base) var(--fs-photo-dim), transparent);
