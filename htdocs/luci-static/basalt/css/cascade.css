@@ -5945,8 +5945,12 @@ body[theme="dark"] #app .module-settings__item {
 		display: flex; flex-direction: column; align-items: stretch; gap: 6px;
 		border: 0; padding: 0; margin: 0;
 	}
-	/* the mock's .field > label: 13px/600, normal case, full ink — not the eyebrow idiom */
+	/* the mock's .field > label: 13px/600, normal case, full ink — not the eyebrow idiom.
+	 * flex: 0 0 auto MANDATORY: base's .cbi-value label.cbi-value-title flex-basis is the
+	 * ROW label-column width (180px); in this COLUMN layout an inherited basis would size
+	 * the label's HEIGHT and push the field 160px down. */
 	.fs-login .cbi-value-title {
+		flex: 0 0 auto;
 		width: auto; max-width: none; padding: 0; text-align: start;
 		font-size: 13px; font-weight: var(--fs-weight); letter-spacing: 0; text-transform: none;
 		color: var(--fs-text);

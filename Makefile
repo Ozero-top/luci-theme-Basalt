@@ -8,7 +8,7 @@ include $(TOPDIR)/rules.mk
 
 LUCI_TITLE:=Basalt Theme - Fluent Design light theme for LuCI
 LUCI_DEPENDS:=+luci-base
-PKG_VERSION:=2.0.6
+PKG_VERSION:=2.0.7
 PKG_RELEASE:=1
 
 # Keep modern CSS (backdrop-filter, custom properties, :has()) untouched.
