@@ -4,16 +4,18 @@
 
 **简体中文** | [English](README.en.md)
 
-面向 [OpenWrt LuCI](https://github.com/openwrt/luci) 的**暗色顶部导航**主题，
+面向 [OpenWrt LuCI](https://github.com/openwrt/luci) 的 **Fluent Design 浅色**主题，
 基于现行 ucode 模板 LuCI 技术栈（OpenWrt 22.03 至 25.12 / SNAPSHOT）。
-v2 的视觉层源自 [luci-theme-footstrap](https://github.com/VizzleTF/luci-theme-footstrap)（Apache-2.0）。
+外壳架构源自 [luci-theme-footstrap](https://github.com/VizzleTF/luci-theme-footstrap)（Apache-2.0），
+视觉层为微软 Fluent 2 设计语言。
 
-- 炭灰暗底：`#1c2128` 页面 / `#22272e` 卡片，蓝色强调 `#569df5`
+- Fluent 浅色：`#f3f2f1` Mica 页面 / `#ffffff` 卡片，Fluent 蓝 `#0078d4`
 - 顶部水平导航：纯文字 pill，子菜单悬停/点击弹出下拉卡片
-- 12 px 大圆角卡片、Manrope→系统字体栈、内置原创几何暗纹背景
-- 暗色唯一：无浅色模式、无外观设置页、无 UCI 配置
-- 登录页为暗色居中卡片，服务端直出（禁用 JS 也可登录，兼容 2FA 插件字段）
-- 窄屏（≤860 px）自动换行为两行：品牌行 + 可横滑的 pill 条
+- Fluent 页头：面包屑 + 大标题，页面动作栏右置；未保存配置横幅可关闭
+- 8 px 圆角梯卡片、Segoe UI→系统字体栈、5% 强度原创几何纹理
+- 浅色唯一：无暗色模式、无外观设置页、无 UCI 配置
+- 登录页为浅色亚克力居中卡片，服务端直出（禁用 JS 也可登录，兼容 2FA 插件字段）
+- 窄屏（≤860 px）自动换行为两行：品牌行 + 可横滑的 pill 条；600 px 内页头动作折行
 - 与官方主题保持相同菜单/Tab/指示器 DOM 契约，所有 LuCI 模块均可正常使用
 
 ## 目录结构
@@ -30,7 +32,7 @@ luci-theme-Basalt/
 ├── htdocs/luci-static/
 │   ├── basalt/                         # 主题媒体根目录
 │   │   ├── css/cascade.css                   # 唯一样式表（构建产物，随包提交）
-│   │   ├── pattern/texture.svg               # 内置原创暗纹
+│   │   ├── pattern/texture.svg               # 内置原创几何纹理（5% 强度）
 │   │   ├── logo.svg / logo_48.png / app-icon-192.png / manifest.json
 │   └── resources/
 │       └── menu-basalt.js              # 顶栏菜单渲染器（自包含，仅依赖 ui/baseclass）
@@ -83,8 +85,8 @@ ucode 模板：
 （`#topmenu`、`#modemenu`、`#tabmenu`、`#indicators`、`#maincontent`），
 菜单/Tab/轮询指示器均由 `menu-basalt.js` 按公开 `ui` API 渲染。
 即使第三方样式表自带全局重置（如 OpenClash），外壳几何也不会塌缩；
-同时声明了 iStoreOS 应用（快捷向导、iStore、VUM）读取的暗色外观契约，
-这些应用会自动以暗色渲染。
+同时声明了 iStoreOS 应用（快捷向导、iStore、VUM）读取的 `theme="light"`
+浅色外观契约，这些应用会自动以浅色渲染。
 
 **浏览器** —— 现代内核（Chrome/Edge、Firefox、Safari 近年版本）获得完整
 体验；旧内核通过 `@supports` 与静态回退值优雅降级（`color-mix`、`:has()`
@@ -164,10 +166,11 @@ uci commit luci
 node build-css.mjs
 ```
 
-`tests/` 包含自包含的浏览器 harness，覆盖暗色 token、暗纹、pill/下拉的
-disclosure 语义（aria/Esc/外部点击/边缘收窄）、tab、以及 1280/390 两种
-视口的顶栏几何。可针对任意 openwrt/luci 分支的**真实** luci-base 核心
-JS 运行：
+`tests/` 包含自包含的浏览器 harness（312 项断言），覆盖浅色 token、纹理层、
+Fluent 页头注入器（面包屑/标题/动作栏迁移/横幅关闭）、pill/下拉的
+disclosure 语义（aria/Esc/外部点击/边缘收窄）、tab、第三方全局重置防护、
+以及 1280/390 两种视口的顶栏几何。可针对任意 openwrt/luci 分支的**真实**
+luci-base 核心 JS 运行：
 
 ```sh
 node build-css.mjs
@@ -190,6 +193,7 @@ opkg remove luci-theme-basalt
 
 | 版本 | 日期       | 说明                          |
 |---------|------------|--------------------------------|
+| 2.0.6   | 2026-10-13 | 重构为 Fluent Design 浅色主题：浅色 token 体系、Fluent 页头（面包屑/迁移动作栏）、未保存配置横幅、概览网格与登录页重绘 |
 | 2.0.2   | 2026-10-09 | 修复第三方应用页面布局塌缩；适配 iStoreOS 应用暗色显示 |
 | 2.0.1   | 2026-10-09 | 修复品牌标题换行与双模式固件导航缺失；更换原创背景暗纹；卡片半透明 |
 | 2.0.0   | 2026-10-09 | 重写为暗色顶部导航（footstrap 视觉）；删除浅色模式与主题设置 |

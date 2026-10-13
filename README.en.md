@@ -4,18 +4,20 @@
 
 [简体中文](README.md) | **English**
 
-A **dark top-navigation** theme for [OpenWrt LuCI](https://github.com/openwrt/luci),
+A **light Fluent Design** theme for [OpenWrt LuCI](https://github.com/openwrt/luci),
 built on the current ucode-template LuCI stack (OpenWrt 22.03 through
-25.12 / SNAPSHOT). The v2 visual layer is vendored from
- [luci-theme-footstrap](https://github.com/VizzleTF/luci-theme-footstrap)（Apache-2.0）。
+25.12 / SNAPSHOT). The shell architecture is vendored from
+[luci-theme-footstrap](https://github.com/VizzleTF/luci-theme-footstrap)（Apache-2.0）；
+the visual layer is Microsoft Fluent 2.
 
-- Charcoal dark surfaces: `#1c2128` page / `#22272e` cards, blue accent `#569df5`
+- Fluent light surfaces: `#f3f2f1` Mica page / `#ffffff` cards, Fluent blue `#0078d4`
 - Horizontal top navigation: text-only pills, hover/tap dropdown panels
-- 12 px rounded cards, Manrope→system font stack, built-in original geometric pattern texture
-- Dark-only: no light scheme, no appearance page, no UCI configuration
-- Login is a dark centered card rendered server-side (works with JS off,
+- Fluent page head: breadcrumbs + large title, page actions docked right; dismissible unsaved-changes banner
+- 8 px radius-ladder cards, Segoe UI→system font stack, original geometric texture at 5% strength
+- Light-only: no dark scheme, no appearance page, no UCI configuration
+- Login is a light acrylic centered card rendered server-side (works with JS off,
   keeps every pluggable-auth/2FA field)
-- Below 860 px the bar wraps to two rows: brand row plus a scrollable pill strip
+- Below 860 px the bar wraps to two rows: brand row plus a scrollable pill strip; the page head stacks below 600 px
 - Same menu/tabs/indicators DOM contract as stock, so every LuCI module keeps working
 
 ## Directory layout
@@ -32,7 +34,7 @@ luci-theme-Basalt/
 ├── htdocs/luci-static/
 │   ├── basalt/                         # theme media root
 │   │   ├── css/cascade.css                   # the single stylesheet (build output, committed)
-│   │   ├── pattern/texture.svg               # built-in original pattern texture
+│   │   ├── pattern/texture.svg               # built-in original texture (5% strength)
 │   │   ├── logo.svg / logo_48.png / app-icon-192.png / manifest.json
 │   └── resources/
 │       └── menu-basalt.js              # top-bar menu renderer (self-contained, ui/baseclass only)
@@ -90,8 +92,8 @@ inside the theme: the shell keeps the stock DOM contract
 and menu/tabs/poll indicators are rendered by `menu-basalt.js`
 using only public `ui` APIs. The shell also keeps its geometry when a
 third-party stylesheet ships a global reset (e.g. OpenClash), and
-declares the dark-appearance contract read by iStoreOS apps
-(quickstart, iStore, VUM), so they render in dark mode automatically.
+declares the `theme="light"` appearance contract read by iStoreOS apps
+(quickstart, iStore, VUM), so they render in light mode automatically.
 
 **Browsers** — recent Chrome/Edge, Firefox and Safari engines get the
 full experience; older engines degrade gracefully via `@supports` and
@@ -174,11 +176,12 @@ packaging — the output is committed). Rebuild after editing styles:
 node build-css.mjs
 ```
 
-`tests/` contains a self-contained browser harness covering the dark
-tokens, the pattern layer, pill/dropdown disclosure semantics
-(aria/Escape/outside-click/edge-clamp), tabs and the bar geometry at
-both 1280 px and 390 px. It runs against the **real** luci-base core
-JS of any openwrt/luci branch:
+`tests/` contains a self-contained browser harness (312 assertions) covering
+the light tokens, the texture layer, the Fluent page-head injector
+(breadcrumbs/title/action-bar migration/banner dismiss), pill/dropdown
+disclosure semantics (aria/Escape/outside-click/edge-clamp), tabs, the
+third-party reset guard and the bar geometry at both 1280 px and 390 px.
+It runs against the **real** luci-base core JS of any openwrt/luci branch:
 
 ```sh
 node build-css.mjs
@@ -201,6 +204,7 @@ opkg remove luci-theme-basalt
 
 | Version | Date       | Notes                          |
 |---------|------------|--------------------------------|
+| 2.0.6   | 2026-10-13 | Rebuild as a light Fluent Design theme: light token system, Fluent page head (breadcrumbs/migrated action bar), unsaved-changes banner, overview grid and login page redraw |
 | 2.0.2   | 2026-10-09 | Fix layout collapse on third-party app pages; dark-mode support for iStoreOS apps |
 | 2.0.1   | 2026-10-09 | Fix brand title wrapping and missing nav on dual-mode firmware; original pattern texture; translucent cards |
 | 2.0.0   | 2026-10-09 | Rewrite as a dark top-navigation theme (footstrap look); light mode and the settings page removed |
